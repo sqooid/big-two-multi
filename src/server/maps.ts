@@ -53,7 +53,6 @@ export function removeUser(socketId: string) {
   const lobby = user.lobby
   if (!lobby) return
   let index = lobby.players.indexOf(user)
-  console.log(index)
   if (index !== undefined) {
     lobby.players.splice(index, 1)
   } else {
