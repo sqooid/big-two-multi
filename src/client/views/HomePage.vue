@@ -29,20 +29,16 @@
 <script lang="ts" setup>
 import { startLobby, startUser } from '@/client/code/session'
 import { store } from '@/client/code/store'
+import { SyncEvent } from '@/client/code/synchronisation'
 import router from '@/client/router'
 import { NSpace, NButton, NInput, NInputGroup, NSwitch } from 'naive-ui'
 import { computed, reactive, ref, watch } from 'vue'
 
-const rstore = reactive(store)
-
-watch(
-  () => store.lobby?.id || '',
-  (id) => {
-    if (!id) return
-    createLoading.value = false
-    router.push({ name: 'lobby', params: { id } })
-  },
-)
+document.addEventListener(SyncEvent.LOBBY, () => {
+  if (!store.lobby.id) return
+  createLoading.value = false
+  router.push({ name: 'lobby', params: { id: store.lobby.id } })
+})
 
 const onChangeName = (name: string) => {
   console.log('Hello', name)
@@ -65,6 +61,7 @@ const onJoin = () => {
 const onSwitchTheme = (value: boolean) => {
   if (value) store.clientSettings.theme = 'dark'
   else store.clientSettings.theme = 'light'
+  document.dispatchEvent(new Event(SyncEvent.SETTINGS))
 }
 </script>
 

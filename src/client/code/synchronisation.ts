@@ -7,6 +7,12 @@ import {
   ServerSyncUser,
 } from '@/interfaces/socket-events'
 
+export enum SyncEvent {
+  USER = 'user',
+  LOBBY = 'lobby',
+  SETTINGS = 'settings',
+}
+
 export function listenLobby(socket: ClientSocket) {
   socket.on('server', (type, payload: ServerSyncLobby) => {
     if (type === ServerEmits.SYNC_LOBBY) {
@@ -17,16 +23,13 @@ export function listenLobby(socket: ClientSocket) {
 }
 
 export function updateLobby(lobby: Partial<ClientLobby>) {
-  if (!store.lobby) {
-    store.lobby = lobby
-    return
-  }
   if (lobby.id) store.lobby.id = lobby.id
   if (lobby.host) store.lobby.host = lobby.host
   if (lobby.players) store.lobby.players = lobby.players
   if (lobby.spectators) store.lobby.spectators = lobby.spectators
   if (lobby.settings) store.lobby.settings = lobby.settings
   if (lobby.game) store.lobby.game = lobby.game
+  document.dispatchEvent(new Event(SyncEvent.LOBBY))
 }
 
 export function listenUser(socket: ClientSocket) {
@@ -38,5 +41,6 @@ export function listenUser(socket: ClientSocket) {
 }
 
 export function updateUser(user: Partial<ClientUser>) {
+  document.dispatchEvent(new Event(SyncEvent.USER))
   if (user.name) store.user.name = user.name
 }

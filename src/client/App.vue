@@ -19,17 +19,18 @@ import {
   NGlobalStyle,
 } from 'naive-ui'
 
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { store } from '@/client/code/store'
+import { SyncEvent } from '@/client/code/synchronisation'
 
 const themeOverrides: GlobalThemeOverrides = {}
 
-const clienSettings = reactive(store.clientSettings)
+const theme = ref<any>(null)
 
 // Theme management
-const theme = computed(() => {
-  if (clienSettings.theme === 'light') return null
-  return darkTheme
+document.addEventListener(SyncEvent.SETTINGS, () => {
+  if (store.clientSettings.theme === 'dark') theme.value = darkTheme
+  else theme.value = null
 })
 </script>
 
