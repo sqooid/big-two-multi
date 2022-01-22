@@ -1,4 +1,5 @@
 import { ServerLobby, ServerUser } from '@/interfaces/server-interfaces'
+import { broadcastLobby } from '@/server/send'
 import { randomString } from '@/server/utils'
 import { createGame } from '@sqooid/big-two'
 
@@ -43,4 +44,28 @@ export function createLobby(host: ServerUser): ServerLobby {
   }
   lobbyMap.set(lobbyId, newLobby)
   return newLobby
+}
+
+export function removeUser(socketId: string) {
+  const user = userMap.get(socketId)
+  if (!user) return
+  userMap.delete(socketId)
+  const lobby = user.lobby
+  if (!lobby) return
+  let index = lobby.players.indexOf(user)
+  console.log(index)
+  if (index !== undefined) {
+    lobby.players.splice(index, 1)
+  } else {
+    index = lobby.spectators.indexOf(user)
+    lobby.spectators.splice(index, 1)
+  }
+  if (lobby.host === user) {
+    lobby.host = lobby.players[0]
+    if (!lobby.host) {
+      lobbyMap.delete(lobby.id)
+      return
+    }
+  }
+  broadcastLobby(lobby)
 }

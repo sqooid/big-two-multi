@@ -8,6 +8,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
 import path from 'path'
+import { removeUser } from '@/server/maps'
 
 dotenv.config()
 
@@ -39,6 +40,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('Client disconnected')
+    removeUser(socket.id)
   })
 })
 
