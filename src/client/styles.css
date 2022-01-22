@@ -1,0 +1,14 @@
+/* Transitions */
+.fade-left-enter-active,
+.fade-left-leave-active {
+  transition: all 0.1s ease-in-out;
+}
+
+.fade-left-enter-from {
+  opacity: 0;
+  transform: translateX(10px);
+}
+
+.fade-left-leave-to {
+  opacity: 0;
+}

@@ -1,0 +1,8 @@
+{
+	"semi": false,
+	"singleQuote": true,
+	"trailingComma": "all",
+	"vue/script-indent": ["error", "tab"],
+	"bracketSameLine": true,
+	"htmlWhitespaceSensitivity": "ignore"
+}
