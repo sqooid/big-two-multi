@@ -15,6 +15,11 @@ export interface ClientUser {
   name: string
 }
 
+export interface OtherPlayerInfo {
+  user: ClientUser
+  remainingCards?: number
+}
+
 export interface ClientLobby {
   id: string
   host: ClientUser

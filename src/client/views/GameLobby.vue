@@ -1,13 +1,72 @@
 <template>
-  <div class="game-lobby"></div>
+  <div id="game-lobby">
+    <div v-if="!rstore.lobby" class="loading-wrapper">
+      <n-spin size="large">
+        <template #description>Loading lobby</template>
+      </n-spin>
+    </div>
+    <div v-else>
+      <n-button @click="onToggleShowSettings" circle>
+        <template #icon>
+          <n-icon>
+            <settings-round />
+          </n-icon>
+        </template>
+      </n-button>
+      <OpponentDisplay :otherPlayers="otherPlayers ?? []" />
+      <n-drawer
+        v-model:show="showSettings"
+        width="100%"
+        height="400px"
+        placement="bottom"
+        to="#game-lobby">
+        <n-drawer-content title="Lobby settings">
+          <LobbySettings
+            :settings="rstore.lobby.settings"
+            :is-host="rstore.lobby.host.socketId === rstore.socket?.id ?? ''" />
+        </n-drawer-content>
+      </n-drawer>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import router from '@/client/router'
-import PlayingCard from '@/client/components/PlayingCard.vue'
+import { NDrawer, NDrawerContent, NButton, NSpin, NIcon } from 'naive-ui'
+import { SettingsRound } from '@vicons/material'
+import LobbySettings from '@/client/components/LobbySettings.vue'
+import { store } from '@/client/code/store'
+import { computed, reactive, ref } from 'vue'
+import OpponentDisplay from '@/client/components/OpponentDisplay.vue'
+import { OtherPlayerInfo } from '@/interfaces/client-interfaces'
+
+const rstore = reactive(store)
+
+const showSettings = ref(false)
+
+const onToggleShowSettings = () => {
+  showSettings.value = !showSettings.value
+}
+
+const otherPlayers = computed(() => {
+  return rstore.lobby?.players.map((user, index) => {
+    return {
+      user,
+      remainingCards: rstore.lobby?.game.remainingCardCount[index],
+    }
+  })
+})
 
 // Lobby ID TODO
 // const id = router.currentRoute.value.params.id
 </script>
 
-<style scoped></style>
+<style scoped>
+.loading-wrapper {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

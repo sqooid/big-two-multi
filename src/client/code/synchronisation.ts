@@ -20,6 +20,11 @@ export function listenLobby(socket: ClientSocket) {
 }
 
 export function updateLobby(lobby: Partial<ClientLobby>) {
+  if (!store.lobby) {
+    store.lobby = lobby as ClientLobby
+    document.dispatchEvent(new Event(SyncEvent.LOBBY))
+    return
+  }
   if (lobby.id) store.lobby.id = lobby.id
   if (lobby.host) store.lobby.host = lobby.host
   if (lobby.players) store.lobby.players = lobby.players
@@ -36,6 +41,11 @@ export function listenUser(socket: ClientSocket) {
 }
 
 export function updateUser(user: Partial<ClientUser>) {
-  document.dispatchEvent(new Event(SyncEvent.USER))
+  if (!store.user) {
+    store.user = user as ClientUser
+    document.dispatchEvent(new Event(SyncEvent.USER))
+    return
+  }
   if (user.name) store.user.name = user.name
+  document.dispatchEvent(new Event(SyncEvent.USER))
 }

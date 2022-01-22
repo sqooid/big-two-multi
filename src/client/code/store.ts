@@ -3,16 +3,14 @@ import { ClientSocket } from '@/interfaces/socket-events'
 
 export interface State {
   socket?: ClientSocket
-  user: Partial<ClientUser>
-  lobby: Partial<ClientLobby>
+  user?: ClientUser
+  lobby?: ClientLobby
   clientSettings: {
     theme: 'light' | 'dark'
   }
 }
 
 export const store: State = {
-  user: {},
-  lobby: {},
   clientSettings: {
     theme: 'light',
   },

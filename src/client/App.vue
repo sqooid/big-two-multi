@@ -3,9 +3,11 @@
     <n-global-style />
     <router-view v-slot="{ Component }">
       <n-message-provider>
-        <transition name="fade-left" mode="out-in">
-          <component :is="Component" />
-        </transition>
+        <n-loading-bar-provider>
+          <transition name="fade-left" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </n-loading-bar-provider>
       </n-message-provider>
     </router-view>
   </n-config-provider>
@@ -20,6 +22,7 @@ import {
   NConfigProvider,
   NGlobalStyle,
   NMessageProvider,
+  NLoadingBarProvider,
 } from 'naive-ui'
 
 import { computed, reactive, ref } from 'vue'

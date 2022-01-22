@@ -3,10 +3,6 @@
     <n-space vertical>
       <h1 class="name">Big Two</h1>
       <n-space justify="center">
-        <!-- Name -->
-        <n-input placeholder="Player name" @change="onChangeName" />
-      </n-space>
-      <n-space justify="center">
         <!-- Create -->
         <n-button :loading="createLoading" @click="onCreate">Create</n-button>
       </n-space>
@@ -42,15 +38,10 @@ import {
 import { computed, reactive, ref, watch } from 'vue'
 
 document.addEventListener(SyncEvent.LOBBY, () => {
-  if (!store.lobby.id) return
+  if (!store.lobby?.id) return
   createLoading.value = false
   router.push({ name: 'lobby', params: { id: store.lobby.id } })
 })
-
-const onChangeName = (name: string) => {
-  console.log('Hello', name)
-  store.user.name = name
-}
 
 const message = useMessage()
 

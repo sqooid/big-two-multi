@@ -12,3 +12,16 @@
 .fade-left-leave-to {
   opacity: 0;
 }
+
+/* Scrollbar */
+* {
+  scrollbar-width: none;
+  scrollbar-color: none none;
+}
+::-webkit-scrollbar {
+  height: 0;
+  width: 0;
+}
+::-webkit-scrollbar-thumb {
+  background-color: none;
+}
