@@ -6,7 +6,6 @@ import {
   ServerUser,
   serverUserToUser,
 } from '@/interfaces/server-interfaces'
-import { ServerEmits } from '@/interfaces/socket-events'
 import { Game } from '@sqooid/big-two'
 
 /**
@@ -24,7 +23,7 @@ export function getClientSpecGame(
     playerIndex: playerIndex,
     currentPlayerIndex: lobbyGame.currentPlayer,
     board: lobbyGame.board,
-    cards: playerIndex ? lobbyGame.players[playerIndex].cards : [],
+    cards: playerIndex ? lobbyGame.players[playerIndex]?.cards ?? [] : [],
     remainingCardCount: lobbyGame.players.map((player) => {
       return player.cards.length
     }),
@@ -47,7 +46,16 @@ export function getClientLobby(user: ServerUser): ClientLobby | undefined {
 
 export function sendLobby(user: ServerUser) {
   const clientLobby = getClientLobby(user)
-  io.to(user.socketId).emit('server', ServerEmits.SYNC_LOBBY, {
-    lobby: clientLobby,
-  })
+  if (!clientLobby) return
+  io.to(user.socketId).emit('syncLobby', clientLobby)
+}
+
+export function broadcastLobby(lobby: ServerLobby) {
+  const players = lobby.players
+  const spectators = lobby.spectators
+  const watchers = players.concat(spectators)
+  for (const watcher of watchers) {
+    const specLobby = getClientLobby(watcher) as ClientLobby
+    io.to(watcher.socketId).emit('syncLobby', specLobby)
+  }
 }

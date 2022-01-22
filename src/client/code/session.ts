@@ -1,9 +1,13 @@
 import { socketConnect } from '@/client/code/socket-connect'
 import { store } from '@/client/code/store'
-import { listenLobby, listenUser } from '@/client/code/synchronisation'
-import { ClientEmits, ServerEmits } from '@/interfaces/socket-events'
+import {
+  FailEvent,
+  listenLobby,
+  listenUser,
+} from '@/client/code/synchronisation'
+import { CallbackResults } from '@/interfaces/socket-events'
 
-export async function startUser() {
+export function startUser() {
   if (store.socket) store.socket.disconnect()
   const socket = socketConnect()
   store.socket = socket
@@ -11,17 +15,22 @@ export async function startUser() {
   listenUser(socket)
 }
 
-export async function startLobby() {
+export function startLobby() {
   const socket = store.socket
   if (!socket) return
   socket.emit('createLobby')
   listenLobby(socket)
 }
 
-export async function joinLobby(lobbyId: string) {
+export function joinLobby(lobbyId: string) {
   const socket = store.socket
-  if (!socket) return
+  if (!socket) return false
   socket.emit('joinLobby', lobbyId, (response) => {
-    console.log(response)
+    if (response.result === CallbackResults.SUCCESS) {
+      console.log('sucess')
+      listenLobby(socket)
+    } else {
+      document.dispatchEvent(new Event(FailEvent.JOIN))
+    }
   })
 }

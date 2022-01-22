@@ -2,9 +2,11 @@
   <n-config-provider :theme="theme" :theme-overrides="themeOverrides">
     <n-global-style />
     <router-view v-slot="{ Component }">
-      <transition name="fade-left" mode="out-in">
-        <component :is="Component" />
-      </transition>
+      <n-message-provider>
+        <transition name="fade-left" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </n-message-provider>
     </router-view>
   </n-config-provider>
 </template>
@@ -17,6 +19,7 @@ import {
   GlobalThemeOverrides,
   NConfigProvider,
   NGlobalStyle,
+  NMessageProvider,
 } from 'naive-ui'
 
 import { computed, reactive, ref } from 'vue'

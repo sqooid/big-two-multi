@@ -1,28 +1,41 @@
-import { sendLobby } from '@/server/send'
+import { broadcastLobby, sendLobby } from '@/server/send'
 import { createLobby, createUser, lobbyMap, userMap } from '@/server/maps'
-import {
-  ClientEmits,
-  ClientSocket,
-  ServerSocket,
-} from '@/interfaces/socket-events'
+import { CallbackResults, ServerSocket } from '@/interfaces/socket-events'
 import { generateName } from '@/server/utils'
 
 export function handleClientEmits(socket: ServerSocket) {
+  // User creation
   socket.on('createUser', (name?: string) => {
     name = name ?? generateName()
     createUser(socket.id, name)
   })
-  socket.on('createUser', () => {
+
+  // Lobby creation
+  socket.on('createLobby', () => {
     const host = userMap.get(socket.id)
     if (!host) return
     const newLobby = createLobby(host)
-    console.log('New lobby created')
+    console.log('Created lobby:', newLobby.id)
     host.lobby = newLobby
     sendLobby(host)
   })
+
+  // Lobby join
   socket.on('joinLobby', (id: string, callback: (response: any) => void) => {
     const user = userMap.get(socket.id)
-    if (!user) return 'error'
-    if (!lobbyMap.get(id)) return 'error'
+    const lobby = lobbyMap.get(id)
+    if (!user || !lobby) {
+      callback({ result: CallbackResults.FAILED })
+      return
+    }
+
+    if (lobby.players.length < 4) lobby.players.push(user)
+    else lobby.spectators.push(user)
+    user.lobby = lobby
+
+    console.log('Joined lobby:', lobby.id)
+
+    callback({ result: CallbackResults.SUCCESS })
+    broadcastLobby(lobby)
   })
 }

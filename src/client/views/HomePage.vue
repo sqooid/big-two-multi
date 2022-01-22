@@ -27,11 +27,18 @@
 </template>
 
 <script lang="ts" setup>
-import { startLobby, startUser } from '@/client/code/session'
+import { joinLobby, startLobby, startUser } from '@/client/code/session'
 import { store } from '@/client/code/store'
-import { SyncEvent } from '@/client/code/synchronisation'
+import { FailEvent, SyncEvent } from '@/client/code/synchronisation'
 import router from '@/client/router'
-import { NSpace, NButton, NInput, NInputGroup, NSwitch } from 'naive-ui'
+import {
+  NSpace,
+  NButton,
+  NInput,
+  NInputGroup,
+  NSwitch,
+  useMessage,
+} from 'naive-ui'
 import { computed, reactive, ref, watch } from 'vue'
 
 document.addEventListener(SyncEvent.LOBBY, () => {
@@ -45,6 +52,8 @@ const onChangeName = (name: string) => {
   store.user.name = name
 }
 
+const message = useMessage()
+
 const createLoading = ref(false)
 const onCreate = async () => {
   createLoading.value = true
@@ -55,8 +64,14 @@ const onCreate = async () => {
 const joinId = ref('')
 const joinLoading = ref(false)
 const onJoin = () => {
-  router.push({ name: 'lobby', params: { id: joinId.value } })
+  joinLoading.value = true
+  startUser()
+  joinLobby(joinId.value)
 }
+document.addEventListener(FailEvent.JOIN, () => {
+  joinLoading.value = false
+  message.error('Failed to join lobby')
+})
 
 const onSwitchTheme = (value: boolean) => {
   if (value) store.clientSettings.theme = 'dark'

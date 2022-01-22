@@ -1,24 +1,21 @@
 import { store } from '@/client/code/store'
 import { ClientLobby, ClientUser } from '@/interfaces/client-interfaces'
-import {
-  ClientSocket,
-  ServerEmits,
-  ServerSyncLobby,
-  ServerSyncUser,
-} from '@/interfaces/socket-events'
+import { ClientSocket } from '@/interfaces/socket-events'
 
 export enum SyncEvent {
-  USER = 'user',
-  LOBBY = 'lobby',
-  SETTINGS = 'settings',
+  USER = 'userSync',
+  LOBBY = 'lobbySync',
+  SETTINGS = 'settingsSync',
+}
+
+export enum FailEvent {
+  JOIN = 'joinError',
 }
 
 export function listenLobby(socket: ClientSocket) {
-  socket.on('server', (type, payload: ServerSyncLobby) => {
-    if (type === ServerEmits.SYNC_LOBBY) {
-      updateLobby(payload.lobby)
-      console.log(payload.lobby)
-    }
+  socket.on('syncLobby', (lobby) => {
+    console.log(lobby)
+    updateLobby(lobby)
   })
 }
 
@@ -33,10 +30,8 @@ export function updateLobby(lobby: Partial<ClientLobby>) {
 }
 
 export function listenUser(socket: ClientSocket) {
-  socket.on('server', (type, payload: ServerSyncUser) => {
-    if (type === ServerEmits.SYNC_USER) {
-      updateUser(payload.user)
-    }
+  socket.on('syncUser', (user) => {
+    updateUser(user)
   })
 }
 
