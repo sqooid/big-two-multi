@@ -1,6 +1,6 @@
 <template>
   <div id="opponent-display">
-    <n-grid :cols="3">
+    <n-grid :cols="3" :x-gap="20">
       <n-gi v-for="player in props.otherPlayers" :key="player.user.socketId">
         <OtherPlayer :player="player.user" :cards="player.remainingCards" />
       </n-gi>

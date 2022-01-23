@@ -2,10 +2,14 @@ import { store } from '@/client/code/store'
 import { ClientLobby, ClientUser } from '@/interfaces/client-interfaces'
 import { ClientSocket } from '@/interfaces/socket-events'
 
-export enum SyncEvent {
-  USER = 'userSync',
-  LOBBY = 'lobbySync',
-  SETTINGS = 'settingsSync',
+export const SyncEvent = {
+  USER: 'userSync',
+  LOBBY: 'lobbySync',
+  lobby: {
+    USERS: 'lobbyUsersSync',
+    GAME: 'lobbyGameSync',
+  },
+  SETTINGS: 'settingsSync',
 }
 
 export enum FailEvent {
@@ -22,16 +26,22 @@ export function listenLobby(socket: ClientSocket) {
 export function updateLobby(lobby: Partial<ClientLobby>) {
   if (!store.lobby) {
     store.lobby = lobby as ClientLobby
-    document.dispatchEvent(new Event(SyncEvent.LOBBY))
+    dispatchSync(SyncEvent.LOBBY)
     return
   }
   if (lobby.id) store.lobby.id = lobby.id
-  if (lobby.host) store.lobby.host = lobby.host
-  if (lobby.players) store.lobby.players = lobby.players
+  if (lobby.host) {
+    console.log('asdf')
+    store.lobby.host = lobby.host
+    dispatchSync(SyncEvent.lobby.USERS)
+  }
+  if (lobby.players) {
+    store.lobby.players = lobby.players
+    dispatchSync(SyncEvent.lobby.USERS)
+  }
   if (lobby.spectators) store.lobby.spectators = lobby.spectators
   if (lobby.settings) store.lobby.settings = lobby.settings
   if (lobby.game) store.lobby.game = lobby.game
-  document.dispatchEvent(new Event(SyncEvent.LOBBY))
 }
 
 export function listenUser(socket: ClientSocket) {
@@ -43,9 +53,13 @@ export function listenUser(socket: ClientSocket) {
 export function updateUser(user: Partial<ClientUser>) {
   if (!store.user) {
     store.user = user as ClientUser
-    document.dispatchEvent(new Event(SyncEvent.USER))
+    dispatchSync(SyncEvent.USER)
     return
   }
   if (user.name) store.user.name = user.name
-  document.dispatchEvent(new Event(SyncEvent.USER))
+  dispatchSync(SyncEvent.USER)
+}
+
+function dispatchSync(type: string) {
+  document.dispatchEvent(new Event(type))
 }

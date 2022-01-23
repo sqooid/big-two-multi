@@ -27,7 +27,6 @@ export function joinLobby(lobbyId: string) {
   if (!socket) return false
   socket.emit('joinLobby', lobbyId, (response) => {
     if (response.result === CallbackResults.SUCCESS) {
-      console.log('sucess')
       listenLobby(socket)
     } else {
       document.dispatchEvent(new Event(FailEvent.JOIN))

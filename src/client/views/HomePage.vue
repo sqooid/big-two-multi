@@ -35,15 +35,21 @@ import {
   NSwitch,
   useMessage,
 } from 'naive-ui'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 
-document.addEventListener(SyncEvent.LOBBY, () => {
+const message = useMessage()
+
+// Lobby receive listening
+const lobbyListener = () => {
   if (!store.lobby?.id) return
   createLoading.value = false
   router.push({ name: 'lobby', params: { id: store.lobby.id } })
+}
+document.addEventListener(SyncEvent.LOBBY, lobbyListener)
+// Remove event listeners
+onUnmounted(() => {
+  document.removeEventListener(SyncEvent.LOBBY, lobbyListener)
 })
-
-const message = useMessage()
 
 const createLoading = ref(false)
 const onCreate = async () => {

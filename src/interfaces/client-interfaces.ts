@@ -17,7 +17,9 @@ export interface ClientUser {
 
 export interface OtherPlayerInfo {
   user: ClientUser
+  isHost: boolean
   remainingCards?: number
+  isTurn?: boolean
 }
 
 export interface ClientLobby {

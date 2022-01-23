@@ -1,13 +1,15 @@
 <template>
-  <n-card class="other-player">
-    <h2>{{ props.player.name }}</h2>
-    <p v-if="props.cards">{{ cards }} cards left</p>
+  <n-card class="other-player" hoverable>
+    <n-h2>{{ props.player.name }}</n-h2>
+    <template #footer v-if="props.cards">
+      <n-p>{{ cards }} cards left</n-p>
+    </template>
   </n-card>
 </template>
 
 <script lang="ts" setup>
 import { ClientUser } from '@/interfaces/client-interfaces'
-import { NCard } from 'naive-ui'
+import { NCard, NH2, NP } from 'naive-ui'
 
 interface Props {
   player: ClientUser
