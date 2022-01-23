@@ -12,8 +12,9 @@ export const SyncEvent = {
   SETTINGS: 'settingsSync',
 }
 
-export enum FailEvent {
-  JOIN = 'joinError',
+export enum JoinEvent {
+  FAIL = 'joinError',
+  SUCCESS = 'joinSuccess',
 }
 
 export function listenLobby(socket: ClientSocket) {

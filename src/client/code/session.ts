@@ -1,7 +1,7 @@
 import { socketConnect } from '@/client/code/socket-connect'
 import { store } from '@/client/code/store'
 import {
-  FailEvent,
+  JoinEvent as JoinEvent,
   listenLobby,
   listenUser,
 } from '@/client/code/synchronisation'
@@ -29,7 +29,7 @@ export function joinLobby(lobbyId: string) {
     if (response.result === CallbackResults.SUCCESS) {
       listenLobby(socket)
     } else {
-      document.dispatchEvent(new Event(FailEvent.JOIN))
+      document.dispatchEvent(new Event(JoinEvent.FAIL))
     }
   })
 }

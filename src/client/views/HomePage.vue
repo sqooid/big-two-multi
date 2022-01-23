@@ -25,7 +25,7 @@
 <script lang="ts" setup>
 import { joinLobby, startLobby, startUser } from '@/client/code/session'
 import { store } from '@/client/code/store'
-import { FailEvent, SyncEvent } from '@/client/code/synchronisation'
+import { JoinEvent, SyncEvent } from '@/client/code/synchronisation'
 import router from '@/client/router'
 import {
   NSpace,
@@ -43,13 +43,10 @@ const message = useMessage()
 const lobbyListener = () => {
   if (!store.lobby?.id) return
   createLoading.value = false
+  document.removeEventListener(SyncEvent.LOBBY, lobbyListener)
   router.push({ name: 'lobby', params: { id: store.lobby.id } })
 }
 document.addEventListener(SyncEvent.LOBBY, lobbyListener)
-// Remove event listeners
-onUnmounted(() => {
-  document.removeEventListener(SyncEvent.LOBBY, lobbyListener)
-})
 
 const createLoading = ref(false)
 const onCreate = async () => {
@@ -65,7 +62,7 @@ const onJoin = () => {
   startUser()
   joinLobby(joinId.value)
 }
-document.addEventListener(FailEvent.JOIN, () => {
+document.addEventListener(JoinEvent.FAIL, () => {
   joinLoading.value = false
   message.error('Failed to join lobby')
 })
