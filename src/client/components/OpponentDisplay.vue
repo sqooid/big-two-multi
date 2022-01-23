@@ -2,7 +2,9 @@
   <div id="opponent-display">
     <n-grid :cols="3" :x-gap="20">
       <n-gi v-for="player in props.otherPlayers" :key="player.user.socketId">
-        <OtherPlayer :player="player.user" :cards="player.remainingCards" />
+        <n-badge type="info" value="Playing..." :show="player.isTurn">
+          <OtherPlayer :player="player.user" :cards="player.remainingCards" />
+        </n-badge>
       </n-gi>
     </n-grid>
   </div>
@@ -10,7 +12,7 @@
 
 <script lang="ts" setup>
 import { ClientUser, OtherPlayerInfo } from '@/interfaces/client-interfaces'
-import { NGrid, NGi } from 'naive-ui'
+import { NGrid, NGi, NBadge } from 'naive-ui'
 import OtherPlayer from '@/client/components/OtherPlayer.vue'
 
 interface Props {

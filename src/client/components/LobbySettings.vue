@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 import { LobbySettings } from '@/interfaces/client-interfaces'
-import { NForm, NFormItem, NSwitch, NInput } from 'naive-ui'
+import { NForm, NFormItem, NSwitch } from 'naive-ui'
 import { toRefs } from 'vue'
 
 interface Props {

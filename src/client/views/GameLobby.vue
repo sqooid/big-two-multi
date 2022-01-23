@@ -37,7 +37,7 @@
 <script lang="ts" setup>
 import router from '@/client/router'
 import { NDrawer, NDrawerContent, NButton, NSpin, NIcon } from 'naive-ui'
-import { SettingsRound } from '@vicons/material'
+import { RsvpOutlined, SettingsRound } from '@vicons/material'
 import LobbySettings from '@/client/components/LobbySettings.vue'
 import { store } from '@/client/code/store'
 import { computed, onUnmounted, reactive, ref } from 'vue'
@@ -81,8 +81,10 @@ const otherPlayers = () => {
     return {
       user: user,
       remainingCards: rstore.lobby?.game.remainingCardCount[ind],
-      isHost: rstore.lobby?.host === user,
-      isTurn: rstore.lobby?.game.currentPlayerIndex === ind,
+      isHost: rstore.lobby?.host.socketId === user.socketId,
+      isTurn:
+        rstore.lobby?.game.turn &&
+        rstore.lobby?.game.currentPlayerIndex === ind,
     }
   })
 }
