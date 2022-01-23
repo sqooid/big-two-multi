@@ -13,9 +13,7 @@
           </n-icon>
         </template>
       </n-button>
-      <OpponentDisplay
-        :key="opponentsKey"
-        :otherPlayers="otherPlayers() ?? []" />
+      <OpponentDisplay :key="opponentsKey" :otherPlayers="otherPlayers()" />
       <n-drawer
         v-model:show="showSettings"
         width="100%"
@@ -83,7 +81,7 @@ const otherPlayers = () => {
       remainingCards: rstore.lobby?.game.remainingCardCount[ind],
       isHost: rstore.lobby?.host.socketId === user.socketId,
       isTurn:
-        rstore.lobby?.game.turn &&
+        Boolean(rstore.lobby?.game.turn) &&
         rstore.lobby?.game.currentPlayerIndex === ind,
     }
   })
