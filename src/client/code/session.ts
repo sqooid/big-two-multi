@@ -24,7 +24,7 @@ export function startLobby() {
 
 export function joinLobby(lobbyId: string) {
   const socket = store.socket
-  if (!socket) return false
+  if (!socket) return
   socket.emit('joinLobby', lobbyId, (response) => {
     if (response.result === CallbackResults.SUCCESS) {
       listenLobby(socket)
@@ -32,4 +32,11 @@ export function joinLobby(lobbyId: string) {
       document.dispatchEvent(new Event(JoinEvent.FAIL))
     }
   })
+}
+
+export function startGame() {
+  const socket = store.socket
+  if (!socket) return
+
+  socket.emit('startGame')
 }

@@ -64,6 +64,11 @@ export function handleClientEmits(socket: ServerSocket) {
     if (!isHost) return
 
     const isFirstGame = lobby.game.turn === 0
-    lobby.game.dealCards(lobby.settings.deal)
+    console.log('Started game: ', lobby.id)
+    if (isFirstGame) {
+      lobby.game.dealCards(lobby.settings.deal)
+    }
+
+    broadCastGame(lobby)
   })
 }

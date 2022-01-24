@@ -1,12 +1,13 @@
 <template>
   <div id="opponent-display">
-    <n-grid :cols="3" :x-gap="20">
-      <n-gi v-for="player in props.otherPlayers" :key="player.user.socketId">
-        <n-badge type="info" value="Playing..." :show="player.isTurn">
-          <OtherPlayer :player="player.user" :cards="player.remainingCards" />
-        </n-badge>
-      </n-gi>
-    </n-grid>
+    <n-badge
+      v-for="player in props.otherPlayers"
+      :key="player.user.socketId"
+      type="info"
+      value="Playing..."
+      :show="player.isTurn">
+      <OtherPlayer :player="player.user" :cards="player.remainingCards" />
+    </n-badge>
   </div>
 </template>
 
@@ -22,4 +23,12 @@ interface Props {
 const props = defineProps<Props>()
 </script>
 
-<style scoped></style>
+<style scoped>
+#opponent-display {
+  height: calc((100vh - 40px) * 0.2);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
+</style>

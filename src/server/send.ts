@@ -18,12 +18,15 @@ export function getClientSpecGame(
   lobbyGame: Game,
   playerIndex?: number,
 ): ClientGame {
+  const isPlayer =
+    playerIndex !== undefined && playerIndex >= 0 && playerIndex <= 3
+  const hasStarted = lobbyGame.players.length !== 0
   return {
-    turn: lobbyGame.turn,
+    turn: hasStarted ? lobbyGame.turn + 1 : 0,
     playerIndex: playerIndex,
     currentPlayerIndex: lobbyGame.currentPlayer,
     board: lobbyGame.board,
-    cards: playerIndex ? lobbyGame.players[playerIndex]?.cards ?? [] : [],
+    cards: isPlayer && hasStarted ? lobbyGame.players[playerIndex].cards : [],
     remainingCardCount: lobbyGame.players.map((player) => {
       return player.cards.length
     }),

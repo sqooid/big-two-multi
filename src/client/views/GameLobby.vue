@@ -6,10 +6,10 @@
       </n-spin>
     </div>
     <div v-else-if="rstore.store.lobby">
-      <LobbySettingsButton @click="onToggleShowSettings" />
       <OpponentDisplay :otherPlayers="otherPlayers" />
       <BoardDisplay />
       <CardDisplay />
+      <LobbySettingsButton @click="onToggleShowSettings" />
       <n-drawer
         v-model:show="showSettings"
         width="100%"
@@ -91,24 +91,29 @@ const onToggleShowSettings = () => {
 
 // Input to other player display
 const otherPlayers = computed(() => {
-  const otherUsers =
-    rstore.store.lobby?.players.filter((user) => {
-      return user.socketId !== rstore.store.socket?.id
-    }) ?? []
-  return otherUsers.map((user, ind) => {
-    return {
-      user: user,
-      remainingCards: rstore.store.lobby?.game.remainingCardCount[ind],
-      isHost: rstore.store.lobby?.host.socketId === user.socketId,
-      isTurn:
-        Boolean(rstore.store.lobby?.game.turn) &&
-        rstore.store.lobby?.game.currentPlayerIndex === ind,
+  const players = rstore.store.lobby?.players
+  if (!players) return []
+
+  return players.reduce((acc, user, ind) => {
+    if (user.socketId !== rstore.store.socket?.id) {
+      acc.push({
+        user: user,
+        remainingCards: rstore.store.lobby?.game.remainingCardCount[ind],
+        isHost: rstore.store.lobby?.host.socketId === user.socketId,
+        isTurn:
+          Boolean(rstore.store.lobby?.game.turn) &&
+          rstore.store.lobby?.game.currentPlayerIndex === ind,
+      } as OtherPlayerInfo)
     }
-  })
+    return acc
+  }, [] as OtherPlayerInfo[])
 })
 </script>
 
 <style scoped>
+#game-lobby {
+  padding: 20px;
+}
 .loading-wrapper {
   width: 100%;
   height: 100vh;
