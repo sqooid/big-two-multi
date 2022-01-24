@@ -6,11 +6,29 @@ export interface ServerUser extends ClientUser {
 }
 
 export interface ServerLobby {
+  /**
+   * Lobby Id
+   */
   id: string
+  /**
+   * User with control over lobby
+   */
   host: ServerUser
+  /**
+   * List of players in turn order (players[0] starts)
+   */
   players: ServerUser[]
+  /**
+   * List of spectators
+   */
   spectators: ServerUser[]
+  /**
+   * Settings currently being used for this lobby
+   */
   settings: LobbySettings
+  /**
+   * Game associated with this lobby
+   */
   game: Game
 }
 

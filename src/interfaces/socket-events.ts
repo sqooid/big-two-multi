@@ -23,6 +23,7 @@ export interface ClientToServerEvents {
   createLobby: (callback?: (response: any) => void) => void
   joinLobby: (id: string, callback: (response: any) => void) => void
   makePlay: (play?: Play) => void
+  startGame: () => void
 }
 
 export type ClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>

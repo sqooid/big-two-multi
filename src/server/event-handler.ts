@@ -30,8 +30,10 @@ export function handleClientEmits(socket: ServerSocket) {
       return
     }
 
-    if (lobby.players.length < 4) lobby.players.push(user)
-    else lobby.spectators.push(user)
+    if (lobby.players.length < 4) {
+      lobby.players.push(user)
+      lobby.settings.deal.playerCount = lobby.players.length
+    } else lobby.spectators.push(user)
     user.lobby = lobby
 
     console.log('Joined lobby:', lobby.id)
@@ -50,5 +52,18 @@ export function handleClientEmits(socket: ServerSocket) {
     if (validPlay && user.lobby) {
       broadCastGame(user.lobby)
     }
+  })
+
+  // Starting games
+  socket.on('startGame', () => {
+    const user = userMap.get(socket.id)
+    const lobby = user?.lobby
+    if (!user || !lobby) return
+
+    const isHost = socket.id === lobby.host.socketId
+    if (!isHost) return
+
+    const isFirstGame = lobby.game.turn === 0
+    lobby.game.dealCards(lobby.settings.deal)
   })
 }

@@ -37,7 +37,7 @@ export function createLobby(host: ServerUser): ServerLobby {
     spectators: [],
     settings: {
       deal: {
-        playerCount: 4,
+        playerCount: 1,
       },
     },
     game: newGame,
@@ -55,6 +55,7 @@ export function removeUser(socketId: string) {
   let indexInLobby = lobby.players.indexOf(user)
   if (indexInLobby !== -1) {
     lobby.players.splice(indexInLobby, 1)
+    lobby.settings.deal.playerCount = lobby.players.length
   } else {
     indexInLobby = lobby.spectators.indexOf(user)
     lobby.spectators.splice(indexInLobby, 1)
