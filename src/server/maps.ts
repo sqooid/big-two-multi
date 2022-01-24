@@ -48,16 +48,16 @@ export function createLobby(host: ServerUser): ServerLobby {
 
 export function removeUser(socketId: string) {
   const user = userMap.get(socketId)
-  if (!user) return
+  if (user === undefined) return
   userMap.delete(socketId)
   const lobby = user.lobby
-  if (!lobby) return
-  let index = lobby.players.indexOf(user)
-  if (index !== undefined) {
-    lobby.players.splice(index, 1)
+  if (lobby === undefined) return
+  let indexInLobby = lobby.players.indexOf(user)
+  if (indexInLobby !== -1) {
+    lobby.players.splice(indexInLobby, 1)
   } else {
-    index = lobby.spectators.indexOf(user)
-    lobby.spectators.splice(index, 1)
+    indexInLobby = lobby.spectators.indexOf(user)
+    lobby.spectators.splice(indexInLobby, 1)
   }
   if (lobby.host === user) {
     lobby.host = lobby.players[0]

@@ -51,11 +51,24 @@ export function sendLobby(user: ServerUser) {
 }
 
 export function broadcastLobby(lobby: ServerLobby) {
-  const players = lobby.players
-  const spectators = lobby.spectators
-  const watchers = players.concat(spectators)
+  const watchers = getLobbyWatchers(lobby)
   for (const watcher of watchers) {
     const specLobby = getClientLobby(watcher) as ClientLobby
     io.to(watcher.socketId).emit('syncLobby', specLobby)
   }
+}
+
+export function broadCastGame(lobby: ServerLobby) {
+  const watchers = getLobbyWatchers(lobby)
+  for (const watcher of watchers) {
+    const playerIndex = lobby.players.indexOf(watcher)
+    const specGame = getClientSpecGame(lobby.game, playerIndex)
+    io.to(watcher.socketId).emit('syncGame', specGame)
+  }
+}
+
+function getLobbyWatchers(lobby: ServerLobby) {
+  const players = lobby.players
+  const spectators = lobby.spectators
+  return players.concat(spectators)
 }

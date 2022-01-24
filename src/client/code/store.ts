@@ -15,3 +15,7 @@ export const store: State = {
     theme: 'light',
   },
 }
+
+export const rstore = {
+  store: {} as State,
+}

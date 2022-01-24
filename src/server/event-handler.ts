@@ -1,7 +1,8 @@
-import { broadcastLobby, sendLobby } from '@/server/send'
+import { broadCastGame, broadcastLobby, sendLobby } from '@/server/send'
 import { createLobby, createUser, lobbyMap, userMap } from '@/server/maps'
 import { CallbackResults, ServerSocket } from '@/interfaces/socket-events'
 import { generateName } from '@/server/utils'
+import { Play } from '@sqooid/big-two'
 
 export function handleClientEmits(socket: ServerSocket) {
   // User creation
@@ -37,5 +38,17 @@ export function handleClientEmits(socket: ServerSocket) {
 
     callback({ result: CallbackResults.SUCCESS })
     broadcastLobby(lobby)
+  })
+
+  // Making plays
+  socket.on('makePlay', (play?: Play) => {
+    const user = userMap.get(socket.id)
+    const game = user?.lobby?.game
+    if (!game) return
+
+    const validPlay = game.makePlay(play)
+    if (validPlay && user.lobby) {
+      broadCastGame(user.lobby)
+    }
   })
 }

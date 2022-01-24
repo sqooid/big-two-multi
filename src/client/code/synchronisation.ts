@@ -1,15 +1,38 @@
-import { store } from '@/client/code/store'
-import { ClientLobby, ClientUser } from '@/interfaces/client-interfaces'
+import { rstore, store } from '@/client/code/store'
+import {
+  ClientGame,
+  ClientLobby,
+  ClientUser,
+} from '@/interfaces/client-interfaces'
 import { ClientSocket } from '@/interfaces/socket-events'
 
 export const SyncEvent = {
+  /**
+   * Entire user has been modified / created
+   */
   USER: 'userSync',
+  /**
+   * Entire lobby has been created
+   */
   LOBBY: 'lobbySync',
   lobby: {
+    /**
+     * State of users in lobby has changed
+     */
     USERS: 'lobbyUsersSync',
+    /**
+     * State of game in lobby has changed
+     */
     GAME: 'lobbyGameSync',
+    /**
+     * State of lobby settings has changed
+     */
+    SETTINGS: 'lobbySettingsSync',
   },
-  SETTINGS: 'settingsSync',
+  /**
+   * Client settings have been changed
+   */
+  CLIENT_SETTINGS: 'clientSettingsSync',
 }
 
 export enum JoinEvent {
@@ -22,27 +45,24 @@ export function listenLobby(socket: ClientSocket) {
     console.log(lobby)
     updateLobby(lobby)
   })
+  socket.on('syncGame', (game) => {
+    console.log(game)
+    updateGame(game)
+  })
 }
 
 export function updateLobby(lobby: Partial<ClientLobby>) {
-  if (!store.lobby) {
-    store.lobby = lobby as ClientLobby
-    dispatchSync(SyncEvent.LOBBY)
+  if (!rstore.store.lobby) {
+    rstore.store.lobby = lobby as ClientLobby
     return
   }
-  if (lobby.id) store.lobby.id = lobby.id
-  if (lobby.host) {
-    console.log('asdf')
-    store.lobby.host = lobby.host
-    dispatchSync(SyncEvent.lobby.USERS)
+  Object.assign(rstore.store.lobby, lobby)
+}
+
+export function updateGame(game: Partial<ClientGame>) {
+  if (rstore.store.lobby?.game) {
+    Object.assign(rstore.store.lobby?.game, game)
   }
-  if (lobby.players) {
-    store.lobby.players = lobby.players
-    dispatchSync(SyncEvent.lobby.USERS)
-  }
-  if (lobby.spectators) store.lobby.spectators = lobby.spectators
-  if (lobby.settings) store.lobby.settings = lobby.settings
-  if (lobby.game) store.lobby.game = lobby.game
 }
 
 export function listenUser(socket: ClientSocket) {
@@ -52,15 +72,9 @@ export function listenUser(socket: ClientSocket) {
 }
 
 export function updateUser(user: Partial<ClientUser>) {
-  if (!store.user) {
-    store.user = user as ClientUser
-    dispatchSync(SyncEvent.USER)
+  if (!rstore.store.user) {
+    rstore.store.user = user as ClientUser
     return
   }
-  if (user.name) store.user.name = user.name
-  dispatchSync(SyncEvent.USER)
-}
-
-function dispatchSync(type: string) {
-  document.dispatchEvent(new Event(type))
+  Object.assign(rstore.store.user, user)
 }

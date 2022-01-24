@@ -24,7 +24,7 @@
 
 <script lang="ts" setup>
 import { joinLobby, startLobby, startUser } from '@/client/code/session'
-import { store } from '@/client/code/store'
+import { rstore, store } from '@/client/code/store'
 import { JoinEvent, SyncEvent } from '@/client/code/synchronisation'
 import router from '@/client/router'
 import {
@@ -35,18 +35,19 @@ import {
   NSwitch,
   useMessage,
 } from 'naive-ui'
-import { computed, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, onUnmounted, reactive, ref, watch, watchEffect } from 'vue'
 
 const message = useMessage()
 
-// Lobby receive listening
-const lobbyListener = () => {
-  if (!store.lobby?.id) return
-  createLoading.value = false
-  document.removeEventListener(SyncEvent.LOBBY, lobbyListener)
-  router.push({ name: 'lobby', params: { id: store.lobby.id } })
-}
-document.addEventListener(SyncEvent.LOBBY, lobbyListener)
+watch(
+  () => rstore.store.lobby,
+  (lobby) => {
+    if (lobby !== undefined) {
+      createLoading.value = false
+      router.push({ name: 'lobby', params: { id: lobby.id } })
+    }
+  },
+)
 
 const createLoading = ref(false)
 const onCreate = async () => {
@@ -68,9 +69,8 @@ document.addEventListener(JoinEvent.FAIL, () => {
 })
 
 const onSwitchTheme = (value: boolean) => {
-  if (value) store.clientSettings.theme = 'dark'
-  else store.clientSettings.theme = 'light'
-  document.dispatchEvent(new Event(SyncEvent.SETTINGS))
+  if (value) rstore.store.clientSettings.theme = 'dark'
+  else rstore.store.clientSettings.theme = 'light'
 }
 </script>
 
