@@ -1,5 +1,8 @@
 <template>
-  <img class="card" :src="`/assets/cards/${suit}-${props.card.value}.svg`" />
+  <img
+    draggable="false"
+    class="card"
+    :src="`/assets/cards/${suit}-${props.card.value}.svg`" />
 </template>
 
 <script lang="ts" setup>

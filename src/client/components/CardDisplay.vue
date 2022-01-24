@@ -3,29 +3,48 @@
     <div v-if="props.cards" class="cards-container">
       <PlayingCard
         class="playing-card"
-        v-for="(card, index) of props.cards"
+        :class="{ selected: selectedCards.indexOf(card) !== -1 }"
+        v-for="(card, index) of sortedCards"
         :style="`z-index: ${index}`"
         :key="`${card.suit},${card.value}`"
         :card="card"
-        @click="selectCard(index)" />
+        @click="toggleSelectCard(card)" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Card } from '@sqooid/big-two'
+import { Card, sortCards } from '@sqooid/big-two'
 import PlayingCard from '@/client/components/PlayingCard.vue'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 
 interface Props {
   cards?: Card[]
+  sortBySuits?: boolean
+}
+const props = defineProps<Props>()
+
+const cardsCopy = [...(props.cards ?? [])]
+const sortedCards = computed(() => {
+  if (!props.cards) return []
+  if (props.sortBySuits) return sortCards(cardsCopy, true)
+  else return sortCards(cardsCopy)
+})
+
+const selectedCards = reactive<Card[]>([])
+
+const toggleSelectCard = (card: Card) => {
+  const cardIndex = selectedCards.indexOf(card)
+  if (cardIndex === -1) {
+    selectedCards.splice(0, 0, card)
+  } else {
+    selectedCards.splice(cardIndex, 1)
+  }
 }
 
-const offset = ref(45)
+const offset = ref(60)
 const cardMargin = computed(() => `${offset.value - 227}px`)
 const containerMargin = computed(() => `${227 - offset.value}px`)
-
-const props = defineProps<Props>()
 </script>
 
 <style scoped>
@@ -43,12 +62,17 @@ const props = defineProps<Props>()
   margin-right: v-bind(containerMargin);
 }
 .playing-card {
+  cursor: pointer;
   border-radius: 10px;
   box-shadow: var(--ideal-shadow);
   transition: all 0.1s ease-in-out;
   margin-right: v-bind(cardMargin);
 }
-.playing-card:hover {
+.playing-card:not(.selected):hover {
   transform: translateY(-20px);
+}
+.selected {
+  transform: translateY(-40px);
+  border: 0.1px dashed green;
 }
 </style>
