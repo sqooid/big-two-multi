@@ -1,10 +1,8 @@
 <template>
-  <img :src="`/assets/cards/${suit}-${props.card.value}.svg`" />
+  <img class="card" :src="`/assets/cards/${suit}-${props.card.value}.svg`" />
 </template>
 
 <script lang="ts" setup>
-import { onUpdated, ref } from 'vue'
-import CardSuit from '@/client/components/CardSuit.vue'
 import { Card, Suit } from '@sqooid/big-two'
 
 interface Props {
@@ -28,4 +26,10 @@ switch (props.card.suit) {
 }
 </script>
 
-<style></style>
+<style scoped>
+.card {
+  max-height: 100%;
+  max-width: 100%;
+  background-color: white;
+}
+</style>

@@ -8,7 +8,7 @@
     <div v-else-if="rstore.store.lobby">
       <OpponentDisplay :otherPlayers="otherPlayers" />
       <BoardDisplay />
-      <CardDisplay />
+      <CardDisplay :cards="rstore.store.lobby.game.cards" />
       <LobbySettingsButton @click="onToggleShowSettings" />
       <n-drawer
         v-model:show="showSettings"
@@ -96,13 +96,14 @@ const otherPlayers = computed(() => {
 
   return players.reduce((acc, user, ind) => {
     if (user.socketId !== rstore.store.socket?.id) {
+      const gameHasStarted =
+        !!rstore.store.lobby && rstore.store.lobby.game.turn > 0
       acc.push({
         user: user,
         remainingCards: rstore.store.lobby?.game.remainingCardCount[ind],
         isHost: rstore.store.lobby?.host.socketId === user.socketId,
         isTurn:
-          Boolean(rstore.store.lobby?.game.turn) &&
-          rstore.store.lobby?.game.currentPlayerIndex === ind,
+          gameHasStarted && rstore.store.lobby?.game.currentPlayerIndex === ind,
       } as OtherPlayerInfo)
     }
     return acc
