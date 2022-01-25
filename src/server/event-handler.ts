@@ -8,6 +8,13 @@ import { createLobby, createUser, lobbyMap, userMap } from '@/server/maps'
 import { CallbackResults, ServerSocket } from '@/interfaces/socket-events'
 import { generateName } from '@/server/utils'
 import { Play } from '@sqooid/big-two'
+import {
+  cardToTupleString,
+  logGamePlays,
+  logGameStartingHands,
+  logToFile,
+} from '@/server/debug'
+import { ServerLobby } from '@/interfaces/server-interfaces'
 
 export function handleClientEmits(socket: ServerSocket) {
   // User creation
@@ -62,6 +69,11 @@ export function handleClientEmits(socket: ServerSocket) {
     if (validPlay && user.lobby) {
       broadCastGame(user.lobby)
     }
+
+    // Logging
+    if (game.isFinished) {
+      logGamePlays(user.lobby as ServerLobby)
+    }
   })
 
   // Starting games
@@ -82,8 +94,10 @@ export function handleClientEmits(socket: ServerSocket) {
     if (isFirstGame) {
       lobby.game.dealCards(lobby.settings.deal)
     }
-
     broadCastGame(lobby)
+
+    // Logging
+    logGameStartingHands(lobby)
   })
 
   // Changing IGN
