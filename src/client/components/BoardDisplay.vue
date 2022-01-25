@@ -10,6 +10,7 @@
     </div>
     <n-carousel
       v-else
+      ref="carouselRef"
       draggable
       :loop="false"
       show-arrow
@@ -19,10 +20,11 @@
         v-for="play of previousPlays"
         :play="play"
         :player-name="store.lobby?.players[play.playerIndex].name ?? ''" />
-      <template #arrow="{ prev, next }">
+      <template #arrow="{ total, currentIndex, prev, next }">
         <div class="carousel-arrow-position-wrapper">
           <div class="carousel-arrow-wrapper">
             <button
+              :class="{ hidden: currentIndex === 0 }"
               type="button"
               class="carousel-arrow arrow-left"
               @click="prev">
@@ -35,6 +37,7 @@
               </n-icon>
             </button>
             <button
+              :class="{ hidden: currentIndex === total - 1 }"
               type="button"
               class="carousel-arrow arrow-right"
               @click="next">
@@ -57,7 +60,7 @@
 import { startGame } from '@/client/code/session'
 import { globalRefs } from '@/client/code/global-refs'
 import { NButton, NCarousel, NIcon, useThemeVars } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import PlayItem from '@/client/components/PlayItem.vue'
 import PlayingCard from './PlayingCard.vue'
 import { newCard } from '@sqooid/big-two'
@@ -75,9 +78,21 @@ const previousPlays = computed(() => {
   return store.lobby?.game.board || []
 })
 
+watch(previousPlays, (plays) => {
+  console.log('playslength: ', plays.length)
+  console.log(carouselRef)
+  if (plays.length > 0) {
+    setTimeout(() => {
+      carouselRef.value.to(plays.length - 1)
+    }, 500)
+  }
+})
+
 const onStartGame = () => {
   startGame()
 }
+
+const carouselRef = ref<any>(null)
 
 const hoverColor = useThemeVars().value.hoverColor
 </script>
@@ -122,6 +137,10 @@ const hoverColor = useThemeVars().value.hoverColor
   height: 100%;
   cursor: pointer;
   transition: all 0.1s ease-in-out;
+}
+.hidden {
+  pointer-events: none;
+  opacity: 0;
 }
 .carousel-arrow:hover {
   background-color: v-bind(hoverColor);

@@ -203,18 +203,7 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 .sorting-switch {
   margin-right: 10px;
 }
-/* .cards-move {
-  transition: all 0.1s ease-in-out;
-}
-.cards-enter-active,
-.cards-leave-active {
-  transition: all 0.2s ease-in-out;
-}
-.cards-enter-from,
-.cards-leave-to {
-  opacity: 0;
-}
 .sorting {
   opacity: 0;
-} */
+}
 </style>
