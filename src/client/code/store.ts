@@ -7,12 +7,16 @@ export interface State {
   lobby?: ClientLobby
   clientSettings: {
     theme: 'light' | 'dark'
+    sortBySuits: boolean
   }
 }
+
+const emptyUser = { name: '', socketId: '' }
 
 export const store: State = {
   clientSettings: {
     theme: 'light',
+    sortBySuits: false,
   },
 }
 

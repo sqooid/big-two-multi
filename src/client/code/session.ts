@@ -6,6 +6,7 @@ import {
   listenUser,
 } from '@/client/code/synchronisation'
 import { CallbackResults } from '@/interfaces/socket-events'
+import { Play } from '@sqooid/big-two'
 
 export function startUser() {
   if (store.socket) store.socket.disconnect()
@@ -39,4 +40,11 @@ export function startGame() {
   if (!socket) return
 
   socket.emit('startGame')
+}
+
+export function sendPlay(play?: Play) {
+  const socket = store.socket
+  if (!socket) return
+
+  socket.emit('makePlay', play)
 }

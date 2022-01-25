@@ -39,7 +39,6 @@ import {
   NIcon,
   useMessage,
 } from 'naive-ui'
-import { RsvpOutlined, SettingsRound } from '@vicons/material'
 import LobbySettings from '@/client/components/LobbySettings.vue'
 import { rstore, store } from '@/client/code/store'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
@@ -88,27 +87,35 @@ const onToggleShowSettings = () => {
   showSettings.value = !showSettings.value
 }
 // Input to settings
-
+console.log(rstore)
 // Input to other player display
-const otherPlayers = computed(() => {
-  const players = rstore.store.lobby?.players
-  if (!players) return []
+const otherPlayers = computed(
+  () => {
+    const players = rstore.store.lobby?.players
+    if (!players) return []
 
-  return players.reduce((acc, user, ind) => {
-    if (user.socketId !== rstore.store.socket?.id) {
-      const gameHasStarted =
-        !!rstore.store.lobby && rstore.store.lobby.game.turn > 0
-      acc.push({
-        user: user,
-        remainingCards: rstore.store.lobby?.game.remainingCardCount[ind],
-        isHost: rstore.store.lobby?.host.socketId === user.socketId,
-        isTurn:
-          gameHasStarted && rstore.store.lobby?.game.currentPlayerIndex === ind,
-      } as OtherPlayerInfo)
-    }
-    return acc
-  }, [] as OtherPlayerInfo[])
-})
+    return players.reduce((acc, user, ind) => {
+      if (user.socketId !== rstore.store.socket?.id) {
+        const gameHasStarted =
+          !!rstore.store.lobby && rstore.store.lobby.game.turn > 0
+        acc.push({
+          user: user,
+          remainingCards: rstore.store.lobby?.game.remainingCardCount[ind],
+          isHost: rstore.store.lobby?.host.socketId === user.socketId,
+          isTurn:
+            gameHasStarted &&
+            rstore.store.lobby?.game.currentPlayerIndex === ind,
+        } as OtherPlayerInfo)
+      }
+      return acc
+    }, [] as OtherPlayerInfo[])
+  },
+  {
+    onTrigger() {
+      // debugger
+    },
+  },
+)
 </script>
 
 <style scoped>

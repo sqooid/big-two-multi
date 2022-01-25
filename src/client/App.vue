@@ -32,6 +32,7 @@ import { SyncEvent } from '@/client/code/synchronisation'
 // Setting up store
 const reactiveStore = reactive(store)
 rstore.store = reactiveStore as State
+console.log(rstore.store)
 
 const themeOverrides: GlobalThemeOverrides = {}
 

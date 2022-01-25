@@ -1,6 +1,27 @@
 <template>
   <div id="card-display">
-    <div v-if="props.cards" class="cards-container">
+    <div class="button-row" v-if="gameHasStarted">
+      <div class="sorting-switch-group">
+        <n-switch v-model:value="sortBySuits" class="sorting-switch" />
+        <span>Group by suit</span>
+      </div>
+      <div v-if="isTurn">
+        <n-button
+          @click="makePlay"
+          class="play-button"
+          v-if="selectedCards.length > 0"
+          :disabled="!validHand"
+          round
+          type="primary">
+          {{ selectedCards.length ? 'Play selected cards' : 'Pass' }}
+        </n-button>
+        <n-button @click="makePlay" round secondary type="warning">
+          Pass
+        </n-button>
+      </div>
+    </div>
+
+    <div class="cards-container">
       <PlayingCard
         class="playing-card"
         :class="{ selected: selectedCards.indexOf(card) !== -1 }"
@@ -14,21 +35,45 @@
 </template>
 
 <script lang="ts" setup>
-import { Card, sortCards } from '@sqooid/big-two'
+import {
+  BoardPlay,
+  Card,
+  findPlay,
+  sortCards,
+  validPlay,
+} from '@sqooid/big-two'
 import PlayingCard from '@/client/components/PlayingCard.vue'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch, watchEffect } from 'vue'
+import { NButton, NTooltip, NSwitch, NH5 } from 'naive-ui'
+import { rstore } from '@/client/code/store'
+import { ClientGame } from '@/interfaces/client-interfaces'
+import router from '@/client/router'
+import { sendPlay } from '@/client/code/session'
 
-interface Props {
-  cards?: Card[]
-  sortBySuits?: boolean
+const store = rstore.store
+
+const isTurn = computed(() => {
+  return store.lobby?.game.currentPlayerIndex === store.lobby?.game.playerIndex
+})
+
+const gameHasStarted = computed(() => {
+  return store.lobby?.game.turn !== 0
+})
+
+if (store.lobby?.game === undefined) {
+  router.push({ name: 'home' })
 }
-const props = defineProps<Props>()
 
-const cardsCopy = [...(props.cards ?? [])]
+const sortBySuits = ref(false)
+
 const sortedCards = computed(() => {
-  if (!props.cards) return []
-  if (props.sortBySuits) return sortCards(cardsCopy, true)
-  else return sortCards(cardsCopy)
+  const cards = store.lobby?.game.cards || []
+  if (cards.length === 0) return []
+  if (sortBySuits.value) {
+    return sortCards(cards, true)
+  } else {
+    return sortCards(cards)
+  }
 })
 
 const selectedCards = reactive<Card[]>([])
@@ -42,21 +87,48 @@ const toggleSelectCard = (card: Card) => {
   }
 }
 
+const validHand = computed(() => {
+  if (selectedCards.length === 0) return true
+  const play = findPlay(selectedCards)
+  console.log(play)
+  const playerIndex = store.lobby?.game.playerIndex as number
+  if (!play || playerIndex === undefined) return false
+  const prevPlay = store.lobby?.game.board[store.lobby?.game.board.length - 1]
+  console.log(prevPlay)
+  return validPlay(
+    {
+      playerIndex,
+      play,
+    },
+    prevPlay,
+  )
+})
+
+const makePlay = () => {
+  if (selectedCards.length === 0) {
+    sendPlay()
+    return
+  }
+  const play = findPlay(selectedCards)
+  sendPlay(play)
+}
+
 const offset = ref(60)
-const cardMargin = computed(() => `${offset.value - 227}px`)
-const containerMargin = computed(() => `${227 - offset.value}px`)
+const cardWidth = 200
+const cardMargin = computed(() => `${offset.value - cardWidth}px`)
+const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 </script>
 
 <style scoped>
 #card-display {
   height: calc((100vh - 40px) * 0.4);
   display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
 }
 .cards-container {
-  height: calc(100% - 40px);
+  height: calc(100% - 80px);
   display: flex;
   flex-direction: row;
   margin-right: v-bind(containerMargin);
@@ -69,10 +141,27 @@ const containerMargin = computed(() => `${227 - offset.value}px`)
   margin-right: v-bind(cardMargin);
 }
 .playing-card:not(.selected):hover {
-  transform: translateY(-20px);
+  transform: translateY(-10px);
 }
 .selected {
   transform: translateY(-40px);
   border: 0.1px dashed green;
+}
+.button-row {
+  width: 100%;
+  margin-bottom: 45px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.play-button {
+  margin-right: 10px;
+}
+.sorting-switch-group {
+  position: absolute;
+  left: 0;
+}
+.sorting-switch {
+  margin-right: 10px;
 }
 </style>

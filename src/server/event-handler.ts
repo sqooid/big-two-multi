@@ -63,6 +63,10 @@ export function handleClientEmits(socket: ServerSocket) {
     const isHost = socket.id === lobby.host.socketId
     if (!isHost) return
 
+    const validPlayerCount =
+      lobby.settings.deal.playerCount > 1 && lobby.settings.deal.playerCount < 5
+    if (!validPlayerCount) return
+
     const isFirstGame = lobby.game.turn === 0
     console.log('Started game: ', lobby.id)
     if (isFirstGame) {

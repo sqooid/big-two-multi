@@ -4,9 +4,13 @@
       v-for="player in props.otherPlayers"
       :key="player.user.socketId"
       type="info"
+      size
       value="Playing..."
-      :show="player.isTurn">
-      <OtherPlayer :player="player.user" :cards="player.remainingCards" />
+      :show="false">
+      <OtherPlayer
+        :player="player.user"
+        :cards="player.remainingCards"
+        :is-turn="player.isTurn" />
     </n-badge>
   </div>
 </template>

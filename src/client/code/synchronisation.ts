@@ -51,6 +51,12 @@ export function listenLobby(socket: ClientSocket) {
   })
 }
 
+export function listenUser(socket: ClientSocket) {
+  socket.on('syncUser', (user) => {
+    updateUser(user)
+  })
+}
+
 export function updateLobby(lobby: Partial<ClientLobby>) {
   if (!rstore.store.lobby) {
     rstore.store.lobby = lobby as ClientLobby
@@ -63,12 +69,6 @@ export function updateGame(game: Partial<ClientGame>) {
   if (rstore.store.lobby?.game) {
     Object.assign(rstore.store.lobby?.game, game)
   }
-}
-
-export function listenUser(socket: ClientSocket) {
-  socket.on('syncUser', (user) => {
-    updateUser(user)
-  })
 }
 
 export function updateUser(user: Partial<ClientUser>) {
