@@ -30,7 +30,11 @@ export function handleClientEmits(socket: ServerSocket) {
       return
     }
 
-    if (lobby.players.length < 4 && lobby.game.players.length === 0) {
+    const gameHasStarted = lobby.game.players.length > 0
+    const gameCanFitMorePlayers =
+      (!gameHasStarted && lobby.players.length >= 4) ||
+      (gameHasStarted && lobby.players.length >= lobby.game.players.length)
+    if (!gameCanFitMorePlayers) {
       lobby.players.push(user)
       lobby.settings.deal.playerCount = lobby.players.length
     } else lobby.spectators.push(user)
@@ -48,7 +52,7 @@ export function handleClientEmits(socket: ServerSocket) {
     const game = user?.lobby?.game
     if (!game) return
 
-    const validPlay = game.makePlay(play)
+    const validPlay = game.makePlay(play ?? undefined)
     if (validPlay && user.lobby) {
       broadCastGame(user.lobby)
     }

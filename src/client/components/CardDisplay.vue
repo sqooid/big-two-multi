@@ -15,14 +15,14 @@
           type="primary">
           {{ selectedCards.length ? 'Play selected cards' : 'Pass' }}
         </n-button>
-        <n-button @click="makePlay" round secondary type="warning">
+        <n-button @click="makePlayPass" round secondary type="warning">
           Pass
         </n-button>
       </div>
     </div>
 
     <!-- <transition-group tag="div" name="cards" class="cards-container"> -->
-    <div class="cards-container">
+    <div class="cards-container" :class="{ sorting: isSortingCards }">
       <PlayingCard
         v-for="(card, index) of sortedCardCopies"
         class="playing-card"
@@ -84,15 +84,21 @@ if (store.lobby?.game === undefined) {
 const sortBySuits = ref(false)
 const sortedCardCopies = reactive<Card[]>([])
 
-watch(
-  () => store.lobby?.game.cards,
-  (originalCards) => {
-    sortedCardCopies.splice(0, Infinity, ...(originalCards ?? []))
-  },
-)
+watchEffect(() => {
+  sortedCardCopies.splice(0, Infinity, ...(store.lobby?.game.cards ?? []))
+})
+
+// Sorting
+const isSortingCards = ref(false)
 watch(sortBySuits, (value) => {
-  if (value) sortCards(sortedCardCopies, true)
-  else sortCards(sortedCardCopies)
+  isSortingCards.value = true
+  setTimeout(() => {
+    if (value) sortCards(sortedCardCopies, true)
+    else sortCards(sortedCardCopies)
+    setTimeout(() => {
+      isSortingCards.value = false
+    }, 50)
+  }, 50)
 })
 
 const sortedCards = computed(() => {
@@ -140,6 +146,9 @@ const makePlay = () => {
   sendPlay(play)
   selectedCards.splice(0, Infinity)
 }
+const makePlayPass = () => {
+  sendPlay()
+}
 
 const offset = ref(60)
 const cardWidth = 200
@@ -160,6 +169,7 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
   display: flex;
   flex-direction: row;
   margin-right: v-bind(containerMargin);
+  transition: all 0.05s linear;
 }
 .playing-card {
   cursor: pointer;
@@ -201,6 +211,9 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 }
 .cards-enter-from,
 .cards-leave-to {
+  opacity: 0;
+}
+.sorting {
   opacity: 0;
 }
 </style>
