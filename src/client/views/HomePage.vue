@@ -24,7 +24,7 @@
 
 <script lang="ts" setup>
 import { joinLobby, startLobby, startUser } from '@/client/code/session'
-import { rstore, store } from '@/client/code/store'
+import { globalRefs } from '@/client/code/global-refs'
 import { JoinEvent, SyncEvent } from '@/client/code/synchronisation'
 import router from '@/client/router'
 import {
@@ -40,7 +40,7 @@ import { computed, onUnmounted, reactive, ref, watch, watchEffect } from 'vue'
 const message = useMessage()
 
 watch(
-  () => rstore.store.lobby,
+  () => globalRefs.reactiveStore.lobby,
   (lobby) => {
     if (lobby !== undefined) {
       createLoading.value = false
@@ -69,8 +69,8 @@ document.addEventListener(JoinEvent.FAIL, () => {
 })
 
 const onSwitchTheme = (value: boolean) => {
-  if (value) rstore.store.clientSettings.theme = 'dark'
-  else rstore.store.clientSettings.theme = 'light'
+  if (value) globalRefs.reactiveStore.clientSettings.theme = 'dark'
+  else globalRefs.reactiveStore.clientSettings.theme = 'light'
 }
 </script>
 

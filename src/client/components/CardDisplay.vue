@@ -45,12 +45,12 @@ import {
 import PlayingCard from '@/client/components/PlayingCard.vue'
 import { computed, reactive, ref, watch, watchEffect } from 'vue'
 import { NButton, NTooltip, NSwitch, NH5 } from 'naive-ui'
-import { rstore } from '@/client/code/store'
+import { globalRefs } from '@/client/code/global-refs'
 import { ClientGame } from '@/interfaces/client-interfaces'
 import router from '@/client/router'
 import { sendPlay } from '@/client/code/session'
 
-const store = rstore.store
+const store = globalRefs.reactiveStore
 
 const isTurn = computed(() => {
   return store.lobby?.game.currentPlayerIndex === store.lobby?.game.playerIndex

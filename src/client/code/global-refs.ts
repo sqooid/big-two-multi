@@ -13,13 +13,13 @@ export interface State {
 
 const emptyUser = { name: '', socketId: '' }
 
-export const store: State = {
+export const unreactiveStore: State = {
   clientSettings: {
     theme: 'light',
     sortBySuits: false,
   },
 }
 
-export const rstore = {
-  store: {} as State,
+export const globalRefs = {
+  reactiveStore: {} as State,
 }

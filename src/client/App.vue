@@ -26,18 +26,18 @@ import {
 } from 'naive-ui'
 
 import { computed, reactive, ref } from 'vue'
-import { rstore, State, store } from '@/client/code/store'
+import { globalRefs, State, unreactiveStore } from '@/client/code/global-refs'
 import { SyncEvent } from '@/client/code/synchronisation'
 
 // Setting up store
-const reactiveStore = reactive(store)
-rstore.store = reactiveStore as State
-console.log(rstore.store)
+const reactiveStore = reactive(unreactiveStore)
+globalRefs.reactiveStore = reactiveStore as State
+const store = globalRefs.reactiveStore // For consistency
 
 const themeOverrides: GlobalThemeOverrides = {}
 
 const theme = computed(() => {
-  if (rstore.store?.clientSettings.theme === 'dark') return darkTheme
+  if (store?.clientSettings.theme === 'dark') return darkTheme
   return null
 })
 </script>

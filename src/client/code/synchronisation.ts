@@ -1,4 +1,4 @@
-import { rstore, store } from '@/client/code/store'
+import { rstore, store } from '@/client/code/global-refsl-refs'
 import {
   ClientGame,
   ClientLobby,

@@ -5,10 +5,10 @@
         <template #description>Loading lobby</template>
       </n-spin>
     </div>
-    <div v-else-if="rstore.store.lobby">
+    <div v-else-if="store.lobby">
       <OpponentDisplay :otherPlayers="otherPlayers" />
       <BoardDisplay />
-      <CardDisplay :cards="rstore.store.lobby.game.cards" />
+      <CardDisplay :cards="store.lobby.game.cards" />
       <LobbySettingsButton @click="onToggleShowSettings" />
       <n-drawer
         v-model:show="showSettings"
@@ -19,10 +19,8 @@
         display-directive="show">
         <n-drawer-content title="Lobby settings">
           <LobbySettings
-            :settings="rstore.store.lobby.settings"
-            :is-host="
-              rstore.store.lobby.host.socketId === rstore.store.socket?.id ?? ''
-            " />
+            :settings="store.lobby.settings"
+            :is-host="store.lobby.host.socketId === store.socket?.id ?? ''" />
         </n-drawer-content>
       </n-drawer>
     </div>
@@ -40,7 +38,7 @@ import {
   useMessage,
 } from 'naive-ui'
 import LobbySettings from '@/client/components/LobbySettings.vue'
-import { rstore, store } from '@/client/code/store'
+import { globalRefs } from '@/client/code/global-refs'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import OpponentDisplay from '@/client/components/OpponentDisplay.vue'
 import { OtherPlayerInfo } from '@/interfaces/client-interfaces'
@@ -49,6 +47,8 @@ import { joinLobby, startUser } from '@/client/code/session'
 import CardDisplay from '@/client/components/CardDisplay.vue'
 import BoardDisplay from '@/client/components/BoardDisplay.vue'
 import LobbySettingsButton from '@/client/components/LobbySettingsButton.vue'
+
+const store = globalRefs.reactiveStore
 
 const message = useMessage()
 const loadingLobby = ref(true)
@@ -70,7 +70,7 @@ if (!store.socket) {
   document.addEventListener(JoinEvent.SUCCESS, joinSuccess)
   // Lobby receive listening
   watch(
-    () => rstore.store.lobby,
+    () => globalRefs.reactiveStore.lobby,
     (lobby) => {
       if (lobby !== undefined) {
         loadingLobby.value = false
@@ -87,24 +87,21 @@ const onToggleShowSettings = () => {
   showSettings.value = !showSettings.value
 }
 // Input to settings
-console.log(rstore)
 // Input to other player display
 const otherPlayers = computed(
   () => {
-    const players = rstore.store.lobby?.players
+    const players = store.lobby?.players
     if (!players) return []
 
     return players.reduce((acc, user, ind) => {
-      if (user.socketId !== rstore.store.socket?.id) {
-        const gameHasStarted =
-          !!rstore.store.lobby && rstore.store.lobby.game.turn > 0
+      if (user.socketId !== store.socket?.id) {
+        const gameHasStarted = !!store.lobby && store.lobby.game.turn > 0
         acc.push({
           user: user,
-          remainingCards: rstore.store.lobby?.game.remainingCardCount[ind],
-          isHost: rstore.store.lobby?.host.socketId === user.socketId,
+          remainingCards: store.lobby?.game.remainingCardCount[ind],
+          isHost: store.lobby?.host.socketId === user.socketId,
           isTurn:
-            gameHasStarted &&
-            rstore.store.lobby?.game.currentPlayerIndex === ind,
+            gameHasStarted && store.lobby?.game.currentPlayerIndex === ind,
         } as OtherPlayerInfo)
       }
       return acc

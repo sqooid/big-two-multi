@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import { startGame } from '@/client/code/session'
-import { rstore } from '@/client/code/store'
+import { rstore } from '@/client/code/global-refs'
 import { NButton } from 'naive-ui'
 
 const onStartGame = () => {
