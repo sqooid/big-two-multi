@@ -76,3 +76,15 @@ function getLobbyWatchers(lobby: ServerLobby) {
   const spectators = lobby.spectators
   return players.concat(spectators)
 }
+
+export function broadcastUsersInLobby(lobby: ServerLobby) {
+  const watchers = getLobbyWatchers(lobby)
+  for (const watcher of watchers) {
+    const lobbyUsersOnly: Partial<ClientLobby> = {
+      host: serverUserToUser(lobby.host),
+      players: lobby.players.map((user) => serverUserToUser(user)),
+      spectators: lobby.spectators.map((user) => serverUserToUser(user)),
+    }
+    io.to(watcher.socketId).emit('syncLobby', lobbyUsersOnly)
+  }
+}

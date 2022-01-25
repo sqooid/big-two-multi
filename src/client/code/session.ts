@@ -12,7 +12,7 @@ export function startUser() {
   if (unreactiveStore.socket) unreactiveStore.socket.disconnect()
   const socket = socketConnect()
   unreactiveStore.socket = socket
-  socket.emit('createUser')
+  socket.emit('createUser', unreactiveStore.clientSettings.name)
   listenUser(socket)
 }
 
@@ -47,4 +47,11 @@ export function sendPlay(play?: Play) {
   if (!socket) return
 
   socket.emit('makePlay', play)
+}
+
+export function changeName(name: string) {
+  const socket = unreactiveStore.socket
+  if (!socket) return
+
+  socket.emit('changeName', name)
 }

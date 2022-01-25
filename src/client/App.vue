@@ -26,8 +26,14 @@ import {
 } from 'naive-ui'
 
 import { computed, reactive, ref } from 'vue'
-import { globalRefs, State, unreactiveStore } from '@/client/code/global-refs'
+import {
+  globalRefs,
+  State,
+  ThemeSetting,
+  unreactiveStore,
+} from '@/client/code/global-refs'
 import { SyncEvent } from '@/client/code/synchronisation'
+import { getKey, StorageKeys } from '@/client/code/storage'
 
 // Setting up store
 const reactiveStore = reactive(unreactiveStore)
@@ -40,6 +46,10 @@ const theme = computed(() => {
   if (store?.clientSettings.theme === 'dark') return darkTheme
   return null
 })
+
+// Loading default client settings
+store.clientSettings.theme = getKey(StorageKeys.DEFAULT_THEME) as ThemeSetting
+store.clientSettings.name = getKey(StorageKeys.DEFAULT_NAME)
 </script>
 
 <style scoped></style>

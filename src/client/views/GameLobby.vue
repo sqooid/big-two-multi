@@ -12,12 +12,11 @@
       <LobbySettingsButton @click="onToggleShowSettings" />
       <n-drawer
         v-model:show="showSettings"
-        width="100%"
-        height="400px"
-        placement="bottom"
+        width="300px"
+        placement="left"
         to="#game-lobby"
         display-directive="show">
-        <n-drawer-content title="Lobby settings">
+        <n-drawer-content title="Settings">
           <LobbySettings
             :settings="store.lobby.settings"
             :is-host="store.lobby.host.socketId === store.socket?.id ?? ''" />

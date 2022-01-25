@@ -1,4 +1,9 @@
-import { broadCastGame, broadcastLobby, sendLobby } from '@/server/send'
+import {
+  broadCastGame,
+  broadcastLobby,
+  broadcastUsersInLobby,
+  sendLobby,
+} from '@/server/send'
 import { createLobby, createUser, lobbyMap, userMap } from '@/server/maps'
 import { CallbackResults, ServerSocket } from '@/interfaces/socket-events'
 import { generateName } from '@/server/utils'
@@ -7,8 +12,9 @@ import { Play } from '@sqooid/big-two'
 export function handleClientEmits(socket: ServerSocket) {
   // User creation
   socket.on('createUser', (name?: string) => {
-    name = name ?? generateName()
-    createUser(socket.id, name)
+    name = name || generateName()
+    const newUser = createUser(socket.id, name)
+    socket.emit('syncUser', newUser)
   })
 
   // Lobby creation
@@ -78,5 +84,24 @@ export function handleClientEmits(socket: ServerSocket) {
     }
 
     broadCastGame(lobby)
+  })
+
+  // Changing IGN
+  socket.on('changeName', (name) => {
+    const user = userMap.get(socket.id)
+    const lobby = user?.lobby
+    if (!user) return
+
+    let newName
+    if (!name) {
+      newName = generateName()
+    } else {
+      newName = name
+    }
+    user.name = newName
+    if (lobby) {
+      broadcastUsersInLobby(lobby)
+    }
+    socket.emit('syncUser', { name: newName })
   })
 }

@@ -16,8 +16,6 @@
           <n-button :loading="joinLoading" @click="onJoin">Join</n-button>
         </n-input-group>
       </n-space>
-      <!-- Theme -->
-      <n-switch :on-update:value="onSwitchTheme"></n-switch>
     </n-space>
   </div>
 </template>
