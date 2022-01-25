@@ -15,6 +15,7 @@ import {
   logToFile,
 } from '@/server/debug'
 import { ServerLobby } from '@/interfaces/server-interfaces'
+import { shuffleArray } from '@/interfaces/general-functions'
 
 export function handleClientEmits(socket: ServerSocket) {
   // User creation
@@ -89,15 +90,26 @@ export function handleClientEmits(socket: ServerSocket) {
       lobby.settings.deal.playerCount > 1 && lobby.settings.deal.playerCount < 5
     if (!validPlayerCount) return
 
-    const isFirstGame = lobby.game.turn === 0
     console.log('Started game: ', lobby.id)
-    if (isFirstGame) {
-      lobby.game.dealCards(lobby.settings.deal)
+    const winnerIndex = lobby.game.winner
+    const isFirstGame = winnerIndex === undefined
+
+    lobby.game.dealCards(lobby.settings.deal)
+    lobby.players = shuffleArray(lobby.players)
+    if (!isFirstGame && lobby.settings.deal.randomHands) {
+      const winner = lobby.players[winnerIndex]
+      const winnerIndexInLobby = lobby.players.indexOf(winner)
+      if (winnerIndexInLobby !== -1) {
+        const tempPlayer = lobby.players[0]
+        lobby.players[0] = lobby.players[winnerIndexInLobby]
+        lobby.players[winnerIndexInLobby] = tempPlayer
+      }
     }
+
     broadCastGame(lobby)
 
     // Logging
-    // logGameStartingHands(lobby)
+    logGameStartingHands(lobby)
   })
 
   // Changing IGN

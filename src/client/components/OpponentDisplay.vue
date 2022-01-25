@@ -29,7 +29,7 @@ const otherPlayers = computed(() => {
       const winnerIndex = store.lobby?.game.winnerIndex
       const isPlayersTurn =
         gameHasStarted &&
-        winnerIndex === undefined &&
+        typeof winnerIndex !== 'number' &&
         store.lobby?.game.currentPlayerIndex === ind
       acc.push({
         user: user,

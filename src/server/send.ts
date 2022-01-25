@@ -70,6 +70,9 @@ export function broadCastGame(lobby: ServerLobby) {
     const playerIndex = lobby.players.indexOf(watcher)
     const specGame = getClientSpecGame(lobby.game, playerIndex)
     io.to(watcher.socketId).emit('syncGame', specGame)
+    io.to(watcher.socketId).emit('syncLobby', {
+      players: lobby.players.map((user) => serverUserToUser(user)),
+    })
   }
 }
 

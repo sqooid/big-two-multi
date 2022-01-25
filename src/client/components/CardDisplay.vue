@@ -15,12 +15,12 @@
       <div v-if="isTurn && !gameIsEnded">
         <transition name="expand">
           <n-button
-            @click=""
+            @click="makePlay"
             class="play-button"
             :disabled="!validHand"
             round
             type="primary">
-            {{ selectedCards.length ? 'Play selected cards' : 'Pass' }}
+            Play selected cards
           </n-button>
         </transition>
         <transition name="expand">
