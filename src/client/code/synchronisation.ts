@@ -1,4 +1,4 @@
-import { rstore, store } from '@/client/code/global-refsl-refs'
+import { globalRefs } from '@/client/code/global-refs'
 import {
   ClientGame,
   ClientLobby,
@@ -58,23 +58,23 @@ export function listenUser(socket: ClientSocket) {
 }
 
 export function updateLobby(lobby: Partial<ClientLobby>) {
-  if (!rstore.store.lobby) {
-    rstore.store.lobby = lobby as ClientLobby
+  if (!globalRefs.reactiveStore.lobby) {
+    globalRefs.reactiveStore.lobby = lobby as ClientLobby
     return
   }
-  Object.assign(rstore.store.lobby, lobby)
+  Object.assign(globalRefs.reactiveStore.lobby, lobby)
 }
 
 export function updateGame(game: Partial<ClientGame>) {
-  if (rstore.store.lobby?.game) {
-    Object.assign(rstore.store.lobby?.game, game)
+  if (globalRefs.reactiveStore.lobby?.game) {
+    Object.assign(globalRefs.reactiveStore.lobby?.game, game)
   }
 }
 
 export function updateUser(user: Partial<ClientUser>) {
-  if (!rstore.store.user) {
-    rstore.store.user = user as ClientUser
+  if (!globalRefs.reactiveStore.user) {
+    globalRefs.reactiveStore.user = user as ClientUser
     return
   }
-  Object.assign(rstore.store.user, user)
+  Object.assign(globalRefs.reactiveStore.user, user)
 }

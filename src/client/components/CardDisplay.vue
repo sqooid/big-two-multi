@@ -23,9 +23,9 @@
 
     <transition-group tag="div" name="cards" class="cards-container">
       <PlayingCard
+        v-for="(card, index) of sortedCardCopies"
         class="playing-card"
         :class="{ selected: selectedCards.indexOf(card) !== -1 }"
-        v-for="(card, index) of sortedCards"
         :style="`z-index: ${index}`"
         :key="`${card.suit},${card.value}`"
         :card="card"
@@ -65,6 +65,18 @@ if (store.lobby?.game === undefined) {
 }
 
 const sortBySuits = ref(false)
+const sortedCardCopies = reactive<Card[]>([])
+
+watch(
+  () => store.lobby?.game.cards,
+  (originalCards) => {
+    sortedCardCopies.splice(0, Infinity, ...(originalCards ?? []))
+  },
+)
+watch(sortBySuits, (value) => {
+  if (value) sortCards(sortedCardCopies, true)
+  else sortCards(sortedCardCopies)
+})
 
 const sortedCards = computed(() => {
   const cards = store.lobby?.game.cards || []

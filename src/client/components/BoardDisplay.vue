@@ -1,6 +1,6 @@
 <template>
   <div id="board-display">
-    <div v-if="rstore.store.lobby?.game.turn === 0">
+    <div v-if="globalRefs.reactiveStore.lobby?.game.turn === 0">
       <n-button type="primary" round @click="onStartGame">Start game</n-button>
     </div>
     <div v-else>Board Display</div>
@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import { startGame } from '@/client/code/session'
-import { rstore } from '@/client/code/global-refs'
+import { globalRefs } from '@/client/code/global-refs'
 import { NButton } from 'naive-ui'
 
 const onStartGame = () => {
