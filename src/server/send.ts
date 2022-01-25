@@ -32,7 +32,7 @@ export function getClientSpecGame(
     remainingCardCount: lobbyGame.players.map((player) => {
       return player.cards.length
     }),
-    winnerIndex: lobbyGame.winner,
+    winnerIndex: lobbyGame.winner ?? -1,
   }
 }
 

@@ -27,9 +27,10 @@ const otherPlayers = computed(() => {
     if (user.socketId !== store.socket?.id) {
       const gameHasStarted = !!store.lobby && store.lobby.game.turn > 0
       const winnerIndex = store.lobby?.game.winnerIndex
+      const gameHasEnded = winnerIndex !== -1
       const isPlayersTurn =
         gameHasStarted &&
-        typeof winnerIndex !== 'number' &&
+        !gameHasEnded &&
         store.lobby?.game.currentPlayerIndex === ind
       acc.push({
         user: user,

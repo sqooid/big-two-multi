@@ -4,7 +4,7 @@ import { BoardPlay, Card } from '@sqooid/big-two'
 export interface ClientGame {
   turn: number
   playerIndex?: number
-  winnerIndex?: number
+  winnerIndex: number
   currentPlayerIndex: number
   board: BoardPlay[]
   cards: Card[]

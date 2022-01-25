@@ -42,7 +42,6 @@ export enum JoinEvent {
 
 export function listenLobby(socket: ClientSocket) {
   socket.on('syncLobby', (lobby) => {
-    console.log(lobby)
     updateLobby(lobby)
   })
   socket.on('syncGame', (game) => {

@@ -15,6 +15,7 @@
       <div v-if="isTurn && !gameIsEnded">
         <transition name="expand">
           <n-button
+            v-if="selectedCards.length > 0"
             @click="makePlay"
             class="play-button"
             :disabled="!validHand"
@@ -79,7 +80,7 @@ const store = globalRefs.reactiveStore
 // })
 
 const gameIsEnded = computed(() => {
-  return typeof store.lobby?.game.winnerIndex === 'number'
+  return store.lobby?.game.winnerIndex !== -1
 })
 
 const isHost = computed(() => {
