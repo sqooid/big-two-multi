@@ -7,11 +7,19 @@
     {
       "type": "pwa-node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Debug server",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/dist/server/index.js",
       "preLaunchTask": "tsc: build - tsconfig.server.json",
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+      "outFiles": ["${workspaceFolder}/dist/server/**/*.js"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Node: Nodemon",
+      "processId": "${command:PickProcess}",
+      "restart": true,
+      "protocol": "inspector"
     }
   ]
 }

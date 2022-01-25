@@ -30,7 +30,7 @@ export function handleClientEmits(socket: ServerSocket) {
       return
     }
 
-    if (lobby.players.length < 4 && lobby.game.turn === 0) {
+    if (lobby.players.length < 4 && lobby.game.players.length === 0) {
       lobby.players.push(user)
       lobby.settings.deal.playerCount = lobby.players.length
     } else lobby.spectators.push(user)
