@@ -3,8 +3,10 @@
     <player-info-card
       v-for="player in otherPlayers"
       :key="player.user.socketId"
+      :index="player.index"
       :player="player.user"
       :cards="player.remainingCards"
+      :is-winner="player.isWinner"
       :is-turn="player.isTurn" />
   </div>
 </template>
@@ -24,12 +26,18 @@ const otherPlayers = computed(() => {
   return players.reduce((acc, user, ind) => {
     if (user.socketId !== store.socket?.id) {
       const gameHasStarted = !!store.lobby && store.lobby.game.turn > 0
+      const winnerIndex = store.lobby?.game.winnerIndex
+      const isPlayersTurn =
+        gameHasStarted &&
+        winnerIndex === undefined &&
+        store.lobby?.game.currentPlayerIndex === ind
       acc.push({
         user: user,
+        index: ind,
         remainingCards: store.lobby?.game.remainingCardCount[ind],
         isHost: store.lobby?.host.socketId === user.socketId,
-        isTurn: gameHasStarted && store.lobby?.game.currentPlayerIndex === ind,
-        isWinner: store.lobby?.game.winnerIndex === ind,
+        isTurn: isPlayersTurn,
+        isWinner: winnerIndex === ind,
       } as OtherPlayerInfo)
     }
     return acc

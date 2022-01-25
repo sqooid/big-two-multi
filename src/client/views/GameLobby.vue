@@ -17,9 +17,7 @@
         to="#game-lobby"
         display-directive="show">
         <n-drawer-content title="Settings">
-          <LobbySettings
-            :settings="store.lobby.settings"
-            :is-host="store.lobby.host.socketId === store.socket?.id ?? ''" />
+          <lobby-settings-panel />
         </n-drawer-content>
       </n-drawer>
     </div>
@@ -29,7 +27,7 @@
 <script lang="ts" setup>
 import router from '@/client/router'
 import { NDrawer, NDrawerContent, NSpin, useMessage } from 'naive-ui'
-import LobbySettings from '@/client/components/LobbySettings.vue'
+import LobbySettings from '@/client/components/LobbySettingsMenu.vue'
 import { globalRefs } from '@/client/code/global-refs'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import OpponentDisplay from '@/client/components/OpponentDisplay.vue'
@@ -39,6 +37,7 @@ import { joinLobby, startUser } from '@/client/code/session'
 import CardDisplay from '@/client/components/CardDisplay.vue'
 import BoardDisplay from '@/client/components/BoardDisplay.vue'
 import LobbySettingsButton from '@/client/components/LobbySettingsButton.vue'
+import LobbySettingsPanel from '@/client/components/LobbySettingsPanel.vue'
 
 const store = globalRefs.reactiveStore
 

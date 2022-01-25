@@ -5,23 +5,32 @@
         <n-switch v-model:value="sortBySuits" class="sorting-switch" />
         <span>Group by suit</span>
       </div>
-      <div v-if="isTurn">
-        <n-button
-          @click="makePlay"
-          class="play-button"
-          v-if="selectedCards.length > 0"
-          :disabled="!validHand"
-          round
-          type="primary">
-          {{ selectedCards.length ? 'Play selected cards' : 'Pass' }}
-        </n-button>
-        <n-button @click="makePlayPass" round secondary type="warning">
-          Pass
-        </n-button>
+      <div v-if="gameIsEnded">
+        <transition name="expand">
+          <n-button @click="startGame" :disabled="!isHost" round type="primary">
+            {{ isHost ? 'Start new game' : 'Wait for host to restart' }}
+          </n-button>
+        </transition>
+      </div>
+      <div v-if="isTurn && !gameIsEnded">
+        <transition name="expand">
+          <n-button
+            @click=""
+            class="play-button"
+            :disabled="!validHand"
+            round
+            type="primary">
+            {{ selectedCards.length ? 'Play selected cards' : 'Pass' }}
+          </n-button>
+        </transition>
+        <transition name="expand">
+          <n-button @click="makePlayPass" round secondary type="warning">
+            Pass
+          </n-button>
+        </transition>
       </div>
     </div>
 
-    <!-- <transition-group tag="div" name="cards" class="cards-container"> -->
     <div class="cards-container" :class="{ sorting: isSortingCards }">
       <playing-card
         v-for="(card, index) of sortedCardCopies"
@@ -32,7 +41,6 @@
         :card="card"
         @click="toggleSelectCard(card)" />
     </div>
-    <!-- </transition-group> -->
   </div>
 </template>
 
@@ -51,7 +59,7 @@ import { NButton, NTooltip, NSwitch, NH5 } from 'naive-ui'
 import { globalRefs } from '@/client/code/global-refs'
 import { ClientGame } from '@/interfaces/client-interfaces'
 import router from '@/client/router'
-import { sendPlay } from '@/client/code/session'
+import { sendPlay, startGame } from '@/client/code/session'
 
 const store = globalRefs.reactiveStore
 
@@ -69,6 +77,14 @@ const store = globalRefs.reactiveStore
 // watch(sortedCardCopies, () => {
 //   cardRefs = []
 // })
+
+const gameIsEnded = computed(() => {
+  return typeof store.lobby?.game.winnerIndex === 'number'
+})
+
+const isHost = computed(() => {
+  return store.lobby?.host.socketId === store.socket?.id
+})
 
 const isTurn = computed(() => {
   return store.lobby?.game.currentPlayerIndex === store.lobby?.game.playerIndex
@@ -177,7 +193,6 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
   height: calc(100% - 80px);
   display: flex;
   flex-direction: row;
-  margin-right: v-bind(containerMargin);
   transition: all 0.05s linear;
 }
 .playing-card {
@@ -186,6 +201,9 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
   box-shadow: var(--ideal-shadow);
   transition: all 0.1s ease-in-out;
   margin-right: v-bind(cardMargin);
+}
+.playing-card:last-child {
+  margin-right: 0;
 }
 .playing-card:not(.selected):hover {
   transform: translateY(-10px);
