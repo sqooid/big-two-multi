@@ -174,7 +174,6 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 }
 .playing-card {
   cursor: pointer;
-  aspect-ratio: 0.714;
   border-radius: 10px;
   box-shadow: var(--ideal-shadow);
   transition: all 0.1s ease-in-out;
@@ -204,7 +203,7 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 .sorting-switch {
   margin-right: 10px;
 }
-.cards-move {
+/* .cards-move {
   transition: all 0.1s ease-in-out;
 }
 .cards-enter-active,
@@ -217,5 +216,5 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 }
 .sorting {
   opacity: 0;
-}
+} */
 </style>

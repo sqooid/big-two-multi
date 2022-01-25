@@ -8,8 +8,47 @@
         Wait for host to start game
       </n-button>
     </div>
-    <n-carousel v-else draggable :loop="false" show-arrow class="carousel">
-      <play-item v-for="play of previousPlays" :play="play" />
+    <n-carousel
+      v-else
+      draggable
+      :loop="false"
+      show-arrow
+      class="carousel"
+      :show-dots="false">
+      <play-item
+        v-for="play of previousPlays"
+        :play="play"
+        :player-name="store.lobby?.players[play.playerIndex].name ?? ''" />
+      <template #arrow="{ prev, next }">
+        <div class="carousel-arrow-position-wrapper">
+          <div class="carousel-arrow-wrapper">
+            <button
+              type="button"
+              class="carousel-arrow arrow-left"
+              @click="prev">
+              <n-icon :size="40" :color="useThemeVars().value.iconColor">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M16.88 2.88a1.25 1.25 0 0 0-1.77 0L6.7 11.29a.996.996 0 0 0 0 1.41l8.41 8.41c.49.49 1.28.49 1.77 0s.49-1.28 0-1.77L9.54 12l7.35-7.35c.48-.49.48-1.28-.01-1.77z"
+                    fill="currentColor"></path>
+                </svg>
+              </n-icon>
+            </button>
+            <button
+              type="button"
+              class="carousel-arrow arrow-right"
+              @click="next">
+              <n-icon :size="40" :color="useThemeVars().value.iconColor">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M7.38 21.01c.49.49 1.28.49 1.77 0l8.31-8.31a.996.996 0 0 0 0-1.41L9.15 2.98c-.49-.49-1.28-.49-1.77 0s-.49 1.28 0 1.77L14.62 12l-7.25 7.25c-.48.48-.48 1.28.01 1.76z"
+                    fill="currentColor"></path>
+                </svg>
+              </n-icon>
+            </button>
+          </div>
+        </div>
+      </template>
     </n-carousel>
   </div>
 </template>
@@ -17,7 +56,7 @@
 <script lang="ts" setup>
 import { startGame } from '@/client/code/session'
 import { globalRefs } from '@/client/code/global-refs'
-import { NButton, NCarousel } from 'naive-ui'
+import { NButton, NCarousel, NIcon, useThemeVars } from 'naive-ui'
 import { computed } from 'vue'
 import PlayItem from '@/client/components/PlayItem.vue'
 import PlayingCard from './PlayingCard.vue'
@@ -39,6 +78,8 @@ const previousPlays = computed(() => {
 const onStartGame = () => {
   startGame()
 }
+
+const hoverColor = useThemeVars().value.hoverColor
 </script>
 
 <style scoped>
@@ -50,14 +91,39 @@ const onStartGame = () => {
   align-items: center;
   justify-content: center;
 }
-.card {
-  width: 100px;
+.carousel {
+  max-width: 1500px;
 }
-.thing {
-  width: 100px;
-  height: 100px;
+.carousel-arrow-position-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  pointer-events: none;
 }
-.carousel-container {
-  max-width: 100%;
+.carousel-arrow-wrapper {
+  height: 100%;
+  width: 100%;
+  max-width: 1500px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.carousel-arrow {
+  pointer-events: auto;
+  background-color: #0000;
+  border: none;
+  border-radius: 10px;
+  height: 100%;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+.carousel-arrow:hover {
+  background-color: v-bind(hoverColor);
 }
 </style>
