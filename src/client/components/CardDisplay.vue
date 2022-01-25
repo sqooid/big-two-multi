@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div class="cards-container">
+    <transition-group tag="div" name="cards" class="cards-container">
       <PlayingCard
         class="playing-card"
         :class="{ selected: selectedCards.indexOf(card) !== -1 }"
@@ -30,7 +30,7 @@
         :key="`${card.suit},${card.value}`"
         :card="card"
         @click="toggleSelectCard(card)" />
-    </div>
+    </transition-group>
   </div>
 </template>
 
@@ -90,11 +90,9 @@ const toggleSelectCard = (card: Card) => {
 const validHand = computed(() => {
   if (selectedCards.length === 0) return true
   const play = findPlay(selectedCards)
-  console.log(play)
   const playerIndex = store.lobby?.game.playerIndex as number
   if (!play || playerIndex === undefined) return false
   const prevPlay = store.lobby?.game.board[store.lobby?.game.board.length - 1]
-  console.log(prevPlay)
   return validPlay(
     {
       playerIndex,
@@ -163,5 +161,17 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 }
 .sorting-switch {
   margin-right: 10px;
+}
+/* .cards-move {
+  transition: all 0.1s ease-in-out;
+} */
+.cards-enter-active,
+.cards-leave-active {
+  transition: all 0.2s ease-in-out;
+}
+.cards-enter-from,
+.cards-leave-to {
+  opacity: 0;
+  transform: translateY(-60px);
 }
 </style>
