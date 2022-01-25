@@ -20,7 +20,7 @@
 
 <script lang="ts" setup>
 import { globalRefs } from '@/client/code/global-refs'
-import { NForm, NFormItem, NSwitch, NH4, NScrollbar, NInput } from 'naive-ui'
+import { NForm, NFormItem, NSwitch, NH4, NInput } from 'naive-ui'
 import { setKey, StorageKeys } from '@/client/code/storage'
 import { watch } from 'vue'
 import { changeName } from '@/client/code/session'

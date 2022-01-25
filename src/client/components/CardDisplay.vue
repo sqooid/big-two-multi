@@ -26,7 +26,7 @@
       <playing-card
         v-for="(card, index) of sortedCardCopies"
         class="playing-card"
-        :class="{ selected: selectedCards.indexOf(card) !== -1 }"
+        :class="{ selected: cardIndexInArray(selectedCards, card) !== -1 }"
         :style="`z-index: ${index}`"
         :key="`${card.suit},${card.value}`"
         :card="card"
@@ -40,6 +40,7 @@
 import {
   BoardPlay,
   Card,
+  cardsEqual,
   findPlay,
   sortCards,
   validPlay,
@@ -111,10 +112,17 @@ const sortedCards = computed(() => {
   }
 })
 
+// Selected cards
 const selectedCards = reactive<Card[]>([])
 
+const cardIndexInArray = (array: Card[], card: Card): number => {
+  return array.findIndex((cardInArray) => {
+    return cardsEqual(cardInArray, card)
+  })
+}
+
 const toggleSelectCard = (card: Card) => {
-  const cardIndex = selectedCards.indexOf(card)
+  const cardIndex = cardIndexInArray(selectedCards, card)
   if (cardIndex === -1) {
     selectedCards.splice(0, 0, card)
   } else {

@@ -72,7 +72,7 @@ export function handleClientEmits(socket: ServerSocket) {
 
     // Logging
     if (game.isFinished) {
-      logGamePlays(user.lobby as ServerLobby)
+      // logGamePlays(user.lobby as ServerLobby)
     }
   })
 
@@ -97,7 +97,7 @@ export function handleClientEmits(socket: ServerSocket) {
     broadCastGame(lobby)
 
     // Logging
-    logGameStartingHands(lobby)
+    // logGameStartingHands(lobby)
   })
 
   // Changing IGN

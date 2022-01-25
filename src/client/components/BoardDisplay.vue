@@ -79,8 +79,6 @@ const previousPlays = computed(() => {
 })
 
 watch(previousPlays, (plays) => {
-  console.log('playslength: ', plays.length)
-  console.log(carouselRef)
   if (plays.length > 0) {
     setTimeout(() => {
       carouselRef.value.to(plays.length - 1)

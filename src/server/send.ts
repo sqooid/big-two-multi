@@ -7,6 +7,7 @@ import {
   serverUserToUser,
 } from '@/interfaces/server-interfaces'
 import { Game } from '@sqooid/big-two'
+import { logGamePlays } from '@/server/debug'
 
 /**
  * Returns game info for specific player (no cheating!)
@@ -31,6 +32,7 @@ export function getClientSpecGame(
     remainingCardCount: lobbyGame.players.map((player) => {
       return player.cards.length
     }),
+    winnerIndex: lobbyGame.winner,
   }
 }
 

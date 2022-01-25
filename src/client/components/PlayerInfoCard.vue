@@ -1,7 +1,10 @@
 <template>
-  <n-card class="other-player" hoverable :content-style="conditionalStyles">
+  <n-card
+    class="player-card"
+    hoverable
+    :class="{ 'is-turn': props.isTurn, 'is-winner': props.isWinner }">
     <n-h3 class="name">{{ props.player.name }}</n-h3>
-    <template #action v-if="props.cards">
+    <template #action v-if="props.cards !== undefined">
       <n-p>{{ cards }} cards left</n-p>
     </template>
   </n-card>
@@ -16,20 +19,25 @@ interface Props {
   player: ClientUser
   cards?: number
   isTurn?: boolean
+  isWinner?: boolean
 }
 
-const conditionalStyles = computed(() => {
-  return props.isTurn
-    ? `background-color:${
-        useThemeVars().value.infoColor
-      };border-top-left-radius:3px;border-top-right-radius:3px;`
-    : ''
-})
+const isTurnBorder = `1px solid ${useThemeVars().value.infoColor}`
+const isWinnerBorder = `1px solid ${useThemeVars().value.warningColor}`
 const props = defineProps<Props>()
 </script>
 
 <style scoped>
+.player-card {
+  width: fit-content;
+}
 .name {
   margin-bottom: 0;
+}
+.is-turn {
+  border: v-bind(isTurnBorder);
+}
+.is-winner {
+  border: v-bind(isWinnerBorder);
 }
 </style>

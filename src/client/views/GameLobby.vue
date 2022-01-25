@@ -6,10 +6,10 @@
       </n-spin>
     </div>
     <div v-else-if="store.lobby">
-      <OpponentDisplay :otherPlayers="otherPlayers" />
+      <OpponentDisplay />
       <BoardDisplay />
       <CardDisplay :cards="store.lobby.game.cards" />
-      <LobbySettingsButton @click="onToggleShowSettings" />
+      <LobbySettingsButton @click="onShowSettings" />
       <n-drawer
         v-model:show="showSettings"
         width="300px"
@@ -28,14 +28,7 @@
 
 <script lang="ts" setup>
 import router from '@/client/router'
-import {
-  NDrawer,
-  NDrawerContent,
-  NButton,
-  NSpin,
-  NIcon,
-  useMessage,
-} from 'naive-ui'
+import { NDrawer, NDrawerContent, NSpin, useMessage } from 'naive-ui'
 import LobbySettings from '@/client/components/LobbySettings.vue'
 import { globalRefs } from '@/client/code/global-refs'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
@@ -82,36 +75,9 @@ if (!store.socket) {
 
 const showSettings = ref(false)
 
-const onToggleShowSettings = () => {
-  showSettings.value = !showSettings.value
+const onShowSettings = () => {
+  showSettings.value = true
 }
-// Input to settings
-// Input to other player display
-const otherPlayers = computed(
-  () => {
-    const players = store.lobby?.players
-    if (!players) return []
-
-    return players.reduce((acc, user, ind) => {
-      if (user.socketId !== store.socket?.id) {
-        const gameHasStarted = !!store.lobby && store.lobby.game.turn > 0
-        acc.push({
-          user: user,
-          remainingCards: store.lobby?.game.remainingCardCount[ind],
-          isHost: store.lobby?.host.socketId === user.socketId,
-          isTurn:
-            gameHasStarted && store.lobby?.game.currentPlayerIndex === ind,
-        } as OtherPlayerInfo)
-      }
-      return acc
-    }, [] as OtherPlayerInfo[])
-  },
-  {
-    onTrigger() {
-      // debugger
-    },
-  },
-)
 </script>
 
 <style scoped>

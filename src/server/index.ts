@@ -24,11 +24,12 @@ export const io = new Server<ClientToServerEvents, ServerToClientEvents>(
   },
 )
 
-const root = path.resolve(__dirname)
-process.chdir(root)
-app.use(express.static(root)) // Fix working root directory
+// const root = path.join(__dirname + '../')
+// console.log(root)
+// process.chdir(root)
+app.use(express.static(process.cwd())) // Fix working root directory
 
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
   console.log('Page served')
   res.sendFile(process.cwd() + '/index.html')
 })
