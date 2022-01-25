@@ -21,7 +21,8 @@
       </div>
     </div>
 
-    <transition-group tag="div" name="cards" class="cards-container">
+    <!-- <transition-group tag="div" name="cards" class="cards-container"> -->
+    <div class="cards-container">
       <PlayingCard
         v-for="(card, index) of sortedCardCopies"
         class="playing-card"
@@ -30,7 +31,8 @@
         :key="`${card.suit},${card.value}`"
         :card="card"
         @click="toggleSelectCard(card)" />
-    </transition-group>
+    </div>
+    <!-- </transition-group> -->
   </div>
 </template>
 
@@ -51,6 +53,21 @@ import router from '@/client/router'
 import { sendPlay } from '@/client/code/session'
 
 const store = globalRefs.reactiveStore
+
+// Attempted transition fix
+// let cardRefs = []
+// const cardAddRef = (el: any) => {
+//   if (el) {
+//     cardRefs.push(el)
+//     const cardRoot = el.rootNode as HTMLElement
+//     cardRoot.addEventListener('mouseover', () => {
+//       cardRoot.style.transform = 'translateY(-60px)'
+//     })
+//   }
+// }
+// watch(sortedCardCopies, () => {
+//   cardRefs = []
+// })
 
 const isTurn = computed(() => {
   return store.lobby?.game.currentPlayerIndex === store.lobby?.game.playerIndex
@@ -121,6 +138,7 @@ const makePlay = () => {
   }
   const play = findPlay(selectedCards)
   sendPlay(play)
+  selectedCards.splice(0, Infinity)
 }
 
 const offset = ref(60)
@@ -174,9 +192,9 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 .sorting-switch {
   margin-right: 10px;
 }
-/* .cards-move {
+.cards-move {
   transition: all 0.1s ease-in-out;
-} */
+}
 .cards-enter-active,
 .cards-leave-active {
   transition: all 0.2s ease-in-out;
@@ -184,6 +202,5 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 .cards-enter-from,
 .cards-leave-to {
   opacity: 0;
-  transform: translateY(-60px);
 }
 </style>

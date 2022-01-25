@@ -16,17 +16,18 @@ import { Game } from '@sqooid/big-two'
  */
 export function getClientSpecGame(
   lobbyGame: Game,
-  playerIndex?: number,
+  playerIndex: number,
 ): ClientGame {
-  const isPlayer =
-    playerIndex !== undefined && playerIndex >= 0 && playerIndex <= 3
+  const isPlayer = playerIndex !== -1 && playerIndex >= 0 && playerIndex <= 3
   const hasStarted = lobbyGame.players.length !== 0
+  const cards =
+    isPlayer && hasStarted ? lobbyGame.players[playerIndex].cards : []
   return {
     turn: hasStarted ? lobbyGame.turn + 1 : 0,
     playerIndex: playerIndex,
     currentPlayerIndex: lobbyGame.currentPlayer,
     board: lobbyGame.board,
-    cards: isPlayer && hasStarted ? lobbyGame.players[playerIndex].cards : [],
+    cards: cards,
     remainingCardCount: lobbyGame.players.map((player) => {
       return player.cards.length
     }),
