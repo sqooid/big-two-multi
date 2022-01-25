@@ -23,7 +23,7 @@
 
     <!-- <transition-group tag="div" name="cards" class="cards-container"> -->
     <div class="cards-container" :class="{ sorting: isSortingCards }">
-      <PlayingCard
+      <playing-card
         v-for="(card, index) of sortedCardCopies"
         class="playing-card"
         :class="{ selected: selectedCards.indexOf(card) !== -1 }"
@@ -158,7 +158,8 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 
 <style scoped>
 #card-display {
-  height: calc((100vh - 40px) * 0.4);
+  max-height: calc((100vh - 40px) * 0.4);
+  height: 350px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -173,6 +174,7 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 }
 .playing-card {
   cursor: pointer;
+  aspect-ratio: 0.714;
   border-radius: 10px;
   box-shadow: var(--ideal-shadow);
   transition: all 0.1s ease-in-out;

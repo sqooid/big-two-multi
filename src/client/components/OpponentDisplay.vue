@@ -29,7 +29,8 @@ const props = defineProps<Props>()
 
 <style scoped>
 #opponent-display {
-  height: calc((100vh - 40px) * 0.2);
+  height: 180px;
+  max-height: calc((100vh - 40px) * 0.2);
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;

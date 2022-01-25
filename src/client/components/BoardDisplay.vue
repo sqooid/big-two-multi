@@ -43,7 +43,8 @@ const onStartGame = () => {
 
 <style scoped>
 #board-display {
-  height: calc((100vh - 40px) * 0.4);
+  height: 350px;
+  max-height: calc((100vh - 40px) * 0.4);
   width: 100%;
   display: flex;
   align-items: center;
