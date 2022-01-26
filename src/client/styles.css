@@ -11,8 +11,11 @@
   opacity: 0;
 }
 
-.expand-enter-active,
+.expand-enter-active {
+  transition: all 0.1s ease-out;
+}
 .expand-leave-active {
+  position: absolute;
   transition: all 0.1s ease-out;
 }
 .expand-enter-from,
@@ -20,11 +23,30 @@
   transform: scale(0);
   opacity: 0;
 }
+.expand-move {
+  transition: transform 0.1s ease-in-out;
+}
+
+/* .drop-down-enter-active {
+  transition: all 0.1s ease-out;
+}
+.drop-down-leave-active {
+  position: absolute;
+}
+.drop-down-enter-from,
+.drop-down-leave-to {
+  opacity: 0;
+  margin-bottom: 40px;
+} */
+.drop-down-move {
+  transition: transform 0.1s ease-in-out;
+}
 
 /* Vars */
 :root {
   --ideal-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.08),
     0 3px 6px 0 rgba(0, 0, 0, 0.06), 0 5px 12px 4px rgba(0, 0, 0, 0.04);
+  --card-height: 250px;
 }
 
 /* Scrollbar */

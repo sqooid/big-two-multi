@@ -1,5 +1,6 @@
 import { ClientLobby, ClientUser } from '@/interfaces/client-interfaces'
 import { ClientSocket } from '@/interfaces/socket-events'
+import Flipping from 'flipping'
 
 export type ThemeSetting = 'light' | 'dark'
 
@@ -24,4 +25,5 @@ export const unreactiveStore: State = {
 
 export const globalRefs = {
   reactiveStore: {} as State,
+  flipping: new Flipping(),
 }

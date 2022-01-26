@@ -13,7 +13,7 @@
         </transition>
       </div>
       <div v-if="isTurn && !gameIsEnded">
-        <transition name="expand">
+        <transition-group tag="div" name="expand">
           <n-button
             v-if="selectedCards.length > 0"
             @click="makePlay"
@@ -23,25 +23,37 @@
             type="primary">
             Play selected cards
           </n-button>
-        </transition>
-        <transition name="expand">
-          <n-button @click="makePlayPass" round secondary type="warning">
+          <n-button
+            @click="makePlayPass"
+            round
+            secondary
+            key="pass-button-key"
+            type="warning">
             Pass
           </n-button>
-        </transition>
+        </transition-group>
       </div>
     </div>
 
-    <div class="cards-container" :class="{ sorting: isSortingCards }">
+    <transition-group
+      name="drop-down"
+      tag="div"
+      class="cards-container"
+      @before-enter="beforeEnterCards"
+      @enter="enterCards"
+      @after-enter="afterEnterCards"
+      @before-leave="beforeLeaveCards"
+      @leave="leaveCards">
       <playing-card
         v-for="(card, index) of sortedCardCopies"
         class="playing-card"
+        :data-index="index"
         :class="{ selected: cardIndexInArray(selectedCards, card) !== -1 }"
         :style="`z-index: ${index}`"
         :key="`${card.suit},${card.value}`"
         :card="card"
         @click="toggleSelectCard(card)" />
-    </div>
+    </transition-group>
   </div>
 </template>
 
@@ -55,29 +67,78 @@ import {
   validPlay,
 } from '@sqooid/big-two'
 import PlayingCard from '@/client/components/PlayingCard.vue'
-import { computed, reactive, ref, watch, watchEffect } from 'vue'
+import {
+  computed,
+  onMounted,
+  onUpdated,
+  reactive,
+  ref,
+  watch,
+  watchEffect,
+} from 'vue'
 import { NButton, NTooltip, NSwitch, NH5 } from 'naive-ui'
 import { globalRefs } from '@/client/code/global-refs'
 import { ClientGame } from '@/interfaces/client-interfaces'
 import router from '@/client/router'
 import { sendPlay, startGame } from '@/client/code/session'
+import { FlipTracker } from '@/client/code/flip'
+
+// Animations (WIP)
+// Enter
+const beforeEnterCards = (el: any) => {
+  el.style.opacity = 0
+}
+const enterCards = (el: any, done: () => void) => {
+  const animation = el.animate(
+    [
+      {
+        transform: 'translateY(-80px)',
+        opacity: '0',
+      },
+      {
+        transform: 'none',
+        opacity: '1',
+        animationDelay: 0,
+      },
+    ],
+    {
+      duration: 300,
+      delay: el.dataset.index * 100,
+      fill: 'none',
+    },
+  )
+  animation.onfinish = done
+}
+const afterEnterCards = (el: any) => {
+  el.style.removeProperty('opacity')
+}
+// Leave
+const beforeLeaveCards = (el: any) => {
+  const pos = el.getBoundingClientRect()
+  el.style.position = 'fixed'
+  el.style.left = pos.left + 'px'
+  el.style.top = pos.top + 'px'
+}
+const leaveCards = (el: any, done: () => void) => {
+  const animation = el.animate(
+    [
+      {
+        transform: 'none',
+        opacity: '1',
+      },
+      {
+        transform: 'translateY(-80px)',
+        opacity: '0',
+      },
+    ],
+    {
+      duration: 300,
+    },
+  )
+  animation.onfinish = done
+}
 
 const store = globalRefs.reactiveStore
-
-// Attempted transition fix
-// let cardRefs = []
-// const cardAddRef = (el: any) => {
-//   if (el) {
-//     cardRefs.push(el)
-//     const cardRoot = el.rootNode as HTMLElement
-//     cardRoot.addEventListener('mouseover', () => {
-//       cardRoot.style.transform = 'translateY(-60px)'
-//     })
-//   }
-// }
-// watch(sortedCardCopies, () => {
-//   cardRefs = []
-// })
 
 const gameIsEnded = computed(() => {
   return store.lobby?.game.winnerIndex !== -1
@@ -107,16 +168,9 @@ watchEffect(() => {
 })
 
 // Sorting
-const isSortingCards = ref(false)
 watch(sortBySuits, (value) => {
-  isSortingCards.value = true
-  setTimeout(() => {
-    if (value) sortCards(sortedCardCopies, true)
-    else sortCards(sortedCardCopies)
-    setTimeout(() => {
-      isSortingCards.value = false
-    }, 50)
-  }, 50)
+  if (value) sortCards(sortedCardCopies, true)
+  else sortCards(sortedCardCopies)
 })
 
 const sortedCards = computed(() => {
@@ -139,12 +193,16 @@ const cardIndexInArray = (array: Card[], card: Card): number => {
 }
 
 const toggleSelectCard = (card: Card) => {
+  globalRefs.flipping.read()
   const cardIndex = cardIndexInArray(selectedCards, card)
   if (cardIndex === -1) {
     selectedCards.splice(0, 0, card)
   } else {
     selectedCards.splice(cardIndex, 1)
   }
+  setTimeout(() => {
+    globalRefs.flipping.flip()
+  }, 20)
 }
 
 const validHand = computed(() => {
@@ -189,15 +247,20 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
   flex-direction: column;
   align-items: center;
   justify-content: end;
+  /* Vars */
+  --selected-raise-height: 40px;
 }
 .cards-container {
-  height: calc(100% - 80px);
+  height: calc(var(--card-height) + var(--selected-raise-height));
   display: flex;
   flex-direction: row;
+  align-items: flex-end;
   transition: all 0.05s linear;
 }
 .playing-card {
   cursor: pointer;
+  height: var(--card-height);
+  max-height: var(--card-height);
   border-radius: 10px;
   box-shadow: var(--ideal-shadow);
   transition: all 0.1s ease-in-out;
@@ -210,12 +273,14 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
   transform: translateY(-10px);
 }
 .selected {
-  transform: translateY(-40px);
+  /* transform: translateY(-40px); */
   border: 0.1px dashed green;
+  margin-bottom: var(--selected-raise-height);
 }
 .button-row {
+  height: 34px;
   width: 100%;
-  margin-bottom: 45px;
+  margin-bottom: 25px;
   position: relative;
   display: flex;
   justify-content: center;
@@ -230,7 +295,18 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 .sorting-switch {
   margin-right: 10px;
 }
-.sorting {
-  opacity: 0;
+@keyframes expand-anim {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.expand {
+  animation-name: expand-anim;
+  animation-fill-mode: both;
+  animation-duration: 0.2s;
+  animation-iteration-count: 1;
 }
 </style>

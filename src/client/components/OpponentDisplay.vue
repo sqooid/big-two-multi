@@ -1,5 +1,5 @@
 <template>
-  <div id="opponent-display">
+  <transition-group name="expand" tag="div" id="opponent-display">
     <player-info-card
       v-for="player in otherPlayers"
       :key="player.user.socketId"
@@ -8,7 +8,7 @@
       :cards="player.remainingCards"
       :is-winner="player.isWinner"
       :is-turn="player.isTurn" />
-  </div>
+  </transition-group>
 </template>
 
 <script lang="ts" setup>
