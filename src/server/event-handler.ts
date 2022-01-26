@@ -73,7 +73,7 @@ export function handleClientEmits(socket: ServerSocket) {
 
     // Logging
     if (game.isFinished) {
-      // logGamePlays(user.lobby as ServerLobby)
+      logGamePlays(user.lobby as ServerLobby)
     }
   })
 
@@ -95,9 +95,9 @@ export function handleClientEmits(socket: ServerSocket) {
     const isFirstGame = winnerIndex === undefined
 
     lobby.game.dealCards(lobby.settings.deal)
+    const winner = lobby.players[winnerIndex ?? 0]
     lobby.players = shuffleArray(lobby.players)
-    if (!isFirstGame && lobby.settings.deal.randomHands) {
-      const winner = lobby.players[winnerIndex]
+    if (!isFirstGame && !lobby.settings.deal.randomHands) {
       const winnerIndexInLobby = lobby.players.indexOf(winner)
       if (winnerIndexInLobby !== -1) {
         const tempPlayer = lobby.players[0]
