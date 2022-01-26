@@ -7,7 +7,8 @@
       :player="player.user"
       :cards="player.remainingCards"
       :is-winner="player.isWinner"
-      :is-turn="player.isTurn" />
+      :is-turn="player.isTurn"
+      :is-you="player.isYou" />
   </transition-group>
 </template>
 
@@ -23,26 +24,24 @@ const otherPlayers = computed(() => {
   const players = store.lobby?.players
   if (!players) return []
 
-  return players.reduce((acc, user, ind) => {
-    if (user.socketId !== store.socket?.id) {
-      const gameHasStarted = !!store.lobby && store.lobby.game.turn > 0
-      const winnerIndex = store.lobby?.game.winnerIndex
-      const gameHasEnded = winnerIndex !== -1
-      const isPlayersTurn =
-        gameHasStarted &&
-        !gameHasEnded &&
-        store.lobby?.game.currentPlayerIndex === ind
-      acc.push({
-        user: user,
-        index: ind,
-        remainingCards: store.lobby?.game.remainingCardCount[ind],
-        isHost: store.lobby?.host.socketId === user.socketId,
-        isTurn: isPlayersTurn,
-        isWinner: winnerIndex === ind,
-      } as OtherPlayerInfo)
+  return players.map((user, ind) => {
+    const gameHasStarted = !!store.lobby && store.lobby.game.turn > 0
+    const winnerIndex = store.lobby?.game.winnerIndex
+    const gameHasEnded = winnerIndex !== -1
+    const isPlayersTurn =
+      gameHasStarted &&
+      !gameHasEnded &&
+      store.lobby?.game.currentPlayerIndex === ind
+    return {
+      user: user,
+      index: ind,
+      remainingCards: store.lobby?.game.remainingCardCount[ind],
+      isHost: store.lobby?.host.socketId === user.socketId,
+      isTurn: isPlayersTurn,
+      isWinner: winnerIndex === ind,
+      isYou: user.socketId === store.socket?.id,
     }
-    return acc
-  }, [] as OtherPlayerInfo[])
+  })
 })
 </script>
 

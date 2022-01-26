@@ -55,6 +55,8 @@ const playerDescription = computed(() => {
   height: calc(100% - 80px);
 }
 .play-item-card {
+  height: var(--card-height);
+  max-height: var(--card-height);
   box-shadow: var(--ideal-shadow);
   border-radius: 10px;
   margin-right: 20px;

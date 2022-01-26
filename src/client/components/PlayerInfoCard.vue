@@ -5,7 +5,7 @@
     :class="{ 'is-turn': props.isTurn, 'is-winner': props.isWinner }">
     <n-h3 class="name">
       <n-text depth="3">{{ props.index + 1 }} -</n-text>
-      {{ props.player.name }}
+      {{ props.player.name }}{{ props.isYou ? ' (You)' : '' }}
     </n-h3>
     <template #action v-if="props.cards !== undefined">
       <n-p>{{ cards }} cards left</n-p>
@@ -24,6 +24,7 @@ interface Props {
   cards?: number
   isTurn?: boolean
   isWinner?: boolean
+  isYou?: boolean
 }
 
 const isTurnBorder = `1px solid ${useThemeVars().value.infoColor}`
