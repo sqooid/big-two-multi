@@ -1,9 +1,37 @@
 <template>
   <div id="board-display">
-    <div v-if="!gameHasStarted">
-      <n-button v-if="isHost" type="primary" round @click="onStartGame">
-        Start game
-      </n-button>
+    <div v-if="!gameHasStarted" class="centered">
+      <div v-if="isHost" class="centered">
+        <n-button
+          type="primary"
+          round
+          @click="onStartGame"
+          :disabled="store.lobby?.players.length === 1">
+          Start game
+        </n-button>
+        <div class="invite-block">
+          <n-text>
+            Lonely? Invite your friends using this link:
+            <br />
+          </n-text>
+          <n-tooltip trigger="click" placement="bottom">
+            <template #trigger>
+              <n-text code class="invite-link" @click="onCopyLink">
+                {{ url }}
+                <n-icon size="15" class="invite-copy-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                      fill="currentColor"></path>
+                  </svg>
+                </n-icon>
+              </n-text>
+            </template>
+            Link copied
+          </n-tooltip>
+        </div>
+      </div>
+
       <n-button v-else type="primary" round disabled>
         Wait for host to start game
       </n-button>
@@ -59,7 +87,14 @@
 <script lang="ts" setup>
 import { startGame } from '@/client/code/session'
 import { globalRefs } from '@/client/code/global-refs'
-import { NButton, NCarousel, NIcon, useThemeVars } from 'naive-ui'
+import {
+  NButton,
+  NCarousel,
+  NIcon,
+  useThemeVars,
+  NText,
+  NTooltip,
+} from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 import PlayItem from '@/client/components/PlayItem.vue'
 import PlayingCard from './PlayingCard.vue'
@@ -77,6 +112,11 @@ const gameHasStarted = computed(() => {
 const previousPlays = computed(() => {
   return store.lobby?.game.board || []
 })
+
+const url = computed(() => window.location.href)
+const onCopyLink = () => {
+  navigator.clipboard.writeText(window.location.href)
+}
 
 watch(previousPlays, (plays) => {
   if (plays.length > 0) {
@@ -103,6 +143,26 @@ const hoverColor = useThemeVars().value.hoverColor
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.invite-block {
+  margin-top: 40px;
+}
+.invite-link {
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+}
+.invite-copy-icon {
+  margin-left: 10px;
 }
 .carousel {
   max-width: 1500px;
