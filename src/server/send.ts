@@ -64,7 +64,7 @@ export function broadcastLobby(lobby: ServerLobby) {
   }
 }
 
-export function broadCastGame(lobby: ServerLobby) {
+export function broadcastGame(lobby: ServerLobby) {
   const watchers = getLobbyWatchers(lobby)
   for (const watcher of watchers) {
     const playerIndex = lobby.players.indexOf(watcher)
@@ -91,5 +91,14 @@ export function broadcastUsersInLobby(lobby: ServerLobby) {
       spectators: lobby.spectators.map((user) => serverUserToUser(user)),
     }
     io.to(watcher.socketId).emit('syncLobby', lobbyUsersOnly)
+  }
+}
+
+export function broadcastLobbySettings(lobby: ServerLobby) {
+  const watchers = getLobbyWatchers(lobby)
+  for (const watcher of watchers) {
+    io.to(watcher.socketId).emit('syncLobby', {
+      settings: lobby.settings,
+    })
   }
 }

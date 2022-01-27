@@ -4,6 +4,7 @@ import {
   ClientGame,
   ClientLobby,
   ClientUser,
+  LobbySettings,
 } from '@/interfaces/client-interfaces'
 import { Play } from '@sqooid/big-two'
 
@@ -25,6 +26,7 @@ export interface ClientToServerEvents {
   makePlay: (play?: Play) => void
   startGame: () => void
   changeName: (name: string) => void
+  changeLobbySettings: (settings: LobbySettings) => void
 }
 
 export type ClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>

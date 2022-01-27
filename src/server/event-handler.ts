@@ -1,5 +1,5 @@
 import {
-  broadCastGame,
+  broadcastGame,
   broadcastLobby,
   broadcastUsersInLobby,
   sendLobby,
@@ -16,6 +16,7 @@ import {
 } from '@/server/debug'
 import { ServerLobby } from '@/interfaces/server-interfaces'
 import { shuffleArray } from '@/interfaces/general-functions'
+import { handleChangeLobbySettings } from '@/server/handlers'
 
 export function handleClientEmits(socket: ServerSocket) {
   // User creation
@@ -68,7 +69,7 @@ export function handleClientEmits(socket: ServerSocket) {
 
     const validPlay = game.makePlay(play ?? undefined)
     if (validPlay && user.lobby) {
-      broadCastGame(user.lobby)
+      broadcastGame(user.lobby)
     }
 
     // Logging
@@ -106,7 +107,7 @@ export function handleClientEmits(socket: ServerSocket) {
       }
     }
 
-    broadCastGame(lobby)
+    broadcastGame(lobby)
 
     // Logging
     logGameStartingHands(lobby)
@@ -130,4 +131,9 @@ export function handleClientEmits(socket: ServerSocket) {
     }
     socket.emit('syncUser', { name: newName })
   })
+
+  // Changing lobby settings
+  socket.on('changeLobbySettings', (settings) =>
+    handleChangeLobbySettings(socket, settings),
+  )
 }

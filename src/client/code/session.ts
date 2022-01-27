@@ -7,6 +7,7 @@ import {
 } from '@/client/code/synchronisation'
 import { CallbackResults } from '@/interfaces/socket-events'
 import { Play } from '@sqooid/big-two'
+import { LobbySettings } from '@/interfaces/client-interfaces'
 
 export function startUser() {
   if (unreactiveStore.socket) unreactiveStore.socket.disconnect()
@@ -54,4 +55,11 @@ export function changeName(name: string) {
   if (!socket) return
 
   socket.emit('changeName', name)
+}
+
+export function changeLobbySettings(settings: LobbySettings) {
+  const socket = unreactiveStore.socket
+  if (!socket) return
+
+  socket.emit('changeLobbySettings', settings)
 }
