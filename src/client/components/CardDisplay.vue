@@ -51,8 +51,7 @@
         :class="{ selected: cardIndexInArray(selectedCards, card) !== -1 }"
         :style="`z-index: ${index}`"
         :key="`${card.suit},${card.value}`"
-        :card="card"
-        @click="toggleSelectCard(card)" />
+        :card="card" />
     </transition-group>
   </div>
 </template>
@@ -78,10 +77,181 @@ import {
 } from 'vue'
 import { NButton, NTooltip, NSwitch, NH5 } from 'naive-ui'
 import { globalRefs } from '@/client/code/global-refs'
-import { ClientGame } from '@/interfaces/client-interfaces'
 import router from '@/client/router'
 import { sendPlay, startGame } from '@/client/code/session'
-import { FlipTracker } from '@/client/code/flip'
+import { elementLight } from 'naive-ui/lib/element/styles'
+
+const store = globalRefs.reactiveStore
+
+// Custom order
+const cardRefs: HTMLElement[] = []
+interface screenPos {
+  x: number
+  y: number
+}
+
+let mouseDownX = 0
+let cardMoved = false
+let grabbedCardIndex = -1
+const lastPos = { x: 0, y: 0 }
+const deltaPos = { x: 0, y: 0 }
+let lastCardPosX = 0
+
+const getPos = (e: MouseEvent): screenPos => {
+  return {
+    x: e.screenX,
+    y: e.screenY,
+  }
+}
+
+const getGrabbedEl = (): HTMLElement | undefined => {
+  return cardRefs[grabbedCardIndex]
+}
+
+const setTransform = (offsetX: number) => {
+  const elem = getGrabbedEl()
+  if (!elem) return
+  elem.style.transform = `translate(${offsetX}px)`
+  if (!elem.classList.contains('selected')) {
+    elem.style.marginBottom = '30px'
+  }
+}
+
+const removeTransform = () => {
+  const elem = getGrabbedEl()
+  if (!elem) return
+  elem.style.removeProperty('transform')
+  elem.style.removeProperty('margin-bottom')
+}
+
+const getIndex = (e: HTMLElement): number => {
+  return Number(e.dataset.index)
+}
+
+const onMouseDown = (e: MouseEvent) => {
+  cardMoved = false
+
+  const elem = e.target as HTMLElement
+  if (!elem) return
+
+  Object.assign(lastPos, getPos(e))
+  lastCardPosX = lastPos.x
+  deltaPos.x = 0
+  deltaPos.y = 0
+  grabbedCardIndex = getIndex(e.target as HTMLElement)
+  setTransform(0)
+  setTimeout(() => {
+    elem.style.transition = 'none'
+  }, 50)
+
+  document.addEventListener('mousemove', onMouseMove)
+  document.addEventListener('mouseup', onMouseUp)
+}
+
+const onMouseUp = (e: MouseEvent) => {
+  if (!cardMoved) {
+    toggleSelectCard(sortedCardCopies[grabbedCardIndex])
+  }
+
+  const elem = getGrabbedEl()
+  if (!elem) return
+  elem.style.removeProperty('transition')
+  removeTransform()
+
+  grabbedCardIndex = -1
+
+  document.removeEventListener('mousemove', onMouseMove)
+  document.removeEventListener('mouseup', onMouseUp)
+}
+
+const onMouseMove = (e: MouseEvent) => {
+  cardMoved = true
+
+  const elem = getGrabbedEl()
+  if (!elem) return
+
+  const index = getIndex(elem)
+
+  if (grabbedCardIndex !== index) return
+  const currPos = getPos(e)
+  const deltaX = currPos.x - lastPos.x
+  const deltaY = currPos.y - lastPos.y
+  Object.assign(lastPos, currPos)
+
+  deltaPos.x += deltaX
+  deltaPos.y += deltaY
+
+  if (currPos.x - lastCardPosX < -cardSpacing.value && grabbedCardIndex > 0) {
+    lastCardPosX = currPos.x
+    deltaPos.x = 0
+    setTransform(deltaPos.x)
+    shiftCard(index, 'left')
+    grabbedCardIndex--
+  } else if (
+    currPos.x - lastCardPosX > cardSpacing.value &&
+    grabbedCardIndex < 12
+  ) {
+    lastCardPosX = currPos.x
+    deltaPos.x = 0
+    setTransform(deltaPos.x)
+    shiftCard(index, 'right')
+    grabbedCardIndex++
+  } else {
+    setTransform(deltaPos.x)
+  }
+}
+
+const onMouseOver = (e: MouseEvent) => {
+  const elem = e.target as HTMLElement
+  if (grabbedCardIndex === -1) {
+    elem.classList.add('playing-card-hover')
+    elem.addEventListener('mouseleave', onMouseLeave)
+  }
+}
+
+const onMouseLeave = (e: MouseEvent) => {
+  const elem = e.target as HTMLElement
+
+  if (getIndex(elem) !== grabbedCardIndex) {
+    elem.classList.remove('playing-card-hover')
+    elem.removeEventListener('mouseleave', onMouseLeave)
+  }
+}
+
+const addCardRef = (el: HTMLElement) => {
+  cardRefs.push(el)
+  el.addEventListener('mousedown', onMouseDown)
+  el.addEventListener('mouseover', onMouseOver)
+}
+watch(
+  () => store.lobby?.roundNumber,
+  () => {
+    cardRefs.length = 0
+  },
+)
+const shiftCard = (index: number, direction: 'left' | 'right') => {
+  if (direction === 'left') {
+    if (index > 0) {
+      swapCardIndices(index - 1, index)
+    }
+  } else {
+    if (index < 12) {
+      swapCardIndices(index + 1, index)
+    }
+  }
+}
+const swapCardIndices = (index1: number, index2: number) => {
+  swapIndices(sortedCardCopies, index1, index2)
+  cardRefs[index1].dataset.index = index2.toString()
+  cardRefs[index2].dataset.index = index1.toString()
+  swapIndices(cardRefs, index1, index2)
+}
+
+const swapIndices = (array: any, index1: number, index2: number) => {
+  const temp = array[index1]
+  array[index1] = array[index2]
+  array[index2] = temp
+}
 
 // Animations (WIP)
 // Enter
@@ -111,6 +281,9 @@ const enterCards = (el: any, done: () => void) => {
 }
 const afterEnterCards = (el: any) => {
   el.style.removeProperty('opacity')
+
+  // Setting card refs here to avoid bugginess
+  addCardRef(el)
 }
 // Leave
 const beforeLeaveCards = (el: any) => {
@@ -138,8 +311,6 @@ const leaveCards = (el: any, done: () => void) => {
   animation.onfinish = done
 }
 
-const store = globalRefs.reactiveStore
-
 const gameIsEnded = computed(() => {
   return store.lobby?.game.winnerIndex !== -1
 })
@@ -163,15 +334,38 @@ if (store.lobby?.game === undefined) {
 const sortBySuits = ref(false)
 const sortedCardCopies = reactive<Card[]>([])
 
-watchEffect(() => {
-  sortedCardCopies.splice(0, Infinity, ...(store.lobby?.game.cards ?? []))
-})
+watch(
+  () => store.lobby?.game.cards,
+  (newCards) => {
+    console.log('top call')
+    if (!newCards) return
+    for (let i = sortedCardCopies.length - 1; i >= 0; i--) {
+      const card = sortedCardCopies[i]
+      const index = newCards?.findIndex((newCard) => cardsEqual(card, newCard))
+      if (index === -1) {
+        sortedCardCopies.splice(i, 1)
+        cardRefs.splice(i, 1)
+        for (let newIndex = i; i < sortedCardCopies.length; ++i) {
+          cardRefs[i].dataset.index = i.toString()
+        }
+      }
+    }
+  },
+)
+
+watch(
+  () => store.lobby?.roundNumber,
+  (round) => {
+    console.log('bottom call')
+    sortedCardCopies.splice(0, Infinity, ...(store.lobby?.game.cards ?? []))
+  },
+)
 
 // Sorting
-watch(sortBySuits, (value) => {
-  if (value) sortCards(sortedCardCopies, true)
-  else sortCards(sortedCardCopies)
-})
+// watch(sortBySuits, (value) => {
+//   if (value) sortCards(sortedCardCopies, true)
+//   else sortCards(sortedCardCopies)
+// })
 
 const sortedCards = computed(() => {
   const cards = store.lobby?.game.cards || []
@@ -233,10 +427,15 @@ const makePlayPass = () => {
   sendPlay()
 }
 
-const offset = ref(60)
-const cardWidth = 200
-const cardMargin = computed(() => `${offset.value - cardWidth}px`)
-const containerMargin = computed(() => `${cardWidth - offset.value}px`)
+const cardSpacing = ref(40)
+const cardWidth = 178.56
+const cardMargin = computed(() => `${cardSpacing.value - cardWidth}px`)
+const containerMargin = computed(() => `${cardWidth - cardSpacing.value}px`)
+
+const cardContainerWidth = computed(() => {
+  const width = (sortedCardCopies.length - 1) * cardSpacing.value + cardWidth
+  return width + 'px'
+})
 </script>
 
 <style scoped>
@@ -255,6 +454,7 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
   display: flex;
   flex-direction: row;
   align-items: flex-end;
+  width: v-bind(cardContainerWidth);
   transition: all 0.05s linear;
 }
 .playing-card {
@@ -269,8 +469,11 @@ const containerMargin = computed(() => `${cardWidth - offset.value}px`)
 .playing-card:last-child {
   margin-right: 0;
 }
-.playing-card:not(.selected):hover {
-  transform: translateY(-10px);
+/* .playing-card:not(.selected):hover {
+  margin-bottom: 10px;
+} */
+.playing-card-hover {
+  margin-bottom: 10px;
 }
 .selected {
   /* transform: translateY(-40px); */

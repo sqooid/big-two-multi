@@ -30,6 +30,10 @@ export interface ServerLobby {
    * Game associated with this lobby
    */
   game: Game
+  /**
+   * Round number of the game currently being played
+   */
+  roundNumber: number
 }
 
 export function serverUserToUser(serverUser: ServerUser): ClientUser {

@@ -32,6 +32,7 @@ export interface ClientLobby {
   spectators: ClientUser[]
   settings: LobbySettings
   game: ClientGame
+  roundNumber: number
 }
 
 export interface LobbySettings {

@@ -90,6 +90,7 @@ export function handleStartGame(socket: ServerSocket) {
   const isFirstGame = winnerIndex === undefined
 
   lobby.game.dealCards(lobby.settings.deal)
+  lobby.roundNumber++
   const winner = lobby.players[winnerIndex ?? 0]
   lobby.players = shuffleArray(lobby.players)
   if (!isFirstGame && !lobby.settings.deal.randomHands) {
@@ -101,7 +102,7 @@ export function handleStartGame(socket: ServerSocket) {
     }
   }
 
-  broadcastGame(lobby)
+  broadcastGame(lobby, true)
 
   // Logging
   logGameStartingHands(lobby)

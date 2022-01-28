@@ -31,6 +31,7 @@ export function createLobby(host: ServerUser): ServerLobby {
   const lobbyId = randomString(16)
   const newGame = createGame()
   const newLobby: ServerLobby = {
+    roundNumber: 0,
     id: lobbyId,
     host: host,
     players: [host],

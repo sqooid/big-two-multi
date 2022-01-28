@@ -47,6 +47,7 @@ export function getClientLobby(user: ServerUser): ClientLobby | undefined {
     spectators: serverLobby.spectators.map((user) => serverUserToUser(user)),
     settings: serverLobby.settings,
     game: getClientSpecGame(serverLobby.game, playerIndex),
+    roundNumber: serverLobby.roundNumber,
   }
 }
 
@@ -64,15 +65,18 @@ export function broadcastLobby(lobby: ServerLobby) {
   }
 }
 
-export function broadcastGame(lobby: ServerLobby) {
+export function broadcastGame(lobby: ServerLobby, newGame?: boolean) {
   const watchers = getLobbyWatchers(lobby)
   for (const watcher of watchers) {
     const playerIndex = lobby.players.indexOf(watcher)
     const specGame = getClientSpecGame(lobby.game, playerIndex)
     io.to(watcher.socketId).emit('syncGame', specGame)
-    io.to(watcher.socketId).emit('syncLobby', {
-      players: lobby.players.map((user) => serverUserToUser(user)),
-    })
+    if (newGame) {
+      io.to(watcher.socketId).emit('syncLobby', {
+        players: lobby.players.map((user) => serverUserToUser(user)),
+        roundNumber: lobby.roundNumber,
+      })
+    }
   }
 }
 
