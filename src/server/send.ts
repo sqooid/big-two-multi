@@ -70,13 +70,13 @@ export function broadcastGame(lobby: ServerLobby, newGame?: boolean) {
   for (const watcher of watchers) {
     const playerIndex = lobby.players.indexOf(watcher)
     const specGame = getClientSpecGame(lobby.game, playerIndex)
-    io.to(watcher.socketId).emit('syncGame', specGame)
     if (newGame) {
       io.to(watcher.socketId).emit('syncLobby', {
         players: lobby.players.map((user) => serverUserToUser(user)),
         roundNumber: lobby.roundNumber,
       })
     }
+    io.to(watcher.socketId).emit('syncGame', specGame)
   }
 }
 

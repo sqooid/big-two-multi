@@ -1,10 +1,6 @@
 <template>
   <div id="card-display">
     <div class="button-row" v-if="gameHasStarted">
-      <div class="sorting-switch-group">
-        <n-switch v-model:value="sortBySuits" class="sorting-switch" />
-        <span>Group by suit</span>
-      </div>
       <div v-if="gameIsEnded">
         <transition name="expand">
           <n-button @click="startGame" :disabled="!isHost" round type="primary">
@@ -45,7 +41,7 @@
       @before-leave="beforeLeaveCards"
       @leave="leaveCards">
       <playing-card
-        v-for="(card, index) of sortedCardCopies"
+        v-for="({ card }, index) of cardArray"
         class="playing-card"
         :data-index="index"
         :class="{ selected: cardIndexInArray(selectedCards, card) !== -1 }"
@@ -80,10 +76,13 @@ import { globalRefs } from '@/client/code/global-refs'
 import router from '@/client/router'
 import { sendPlay, startGame } from '@/client/code/session'
 import { elementLight } from 'naive-ui/lib/element/styles'
+import clear from 'naive-ui/lib/_internal/clear'
 
 const store = globalRefs.reactiveStore
 
 // Custom order
+const cardArray: { card: Card; el?: HTMLElement }[] = reactive([])
+
 const cardRefs: HTMLElement[] = []
 interface screenPos {
   x: number
@@ -92,6 +91,7 @@ interface screenPos {
 
 let mouseDownX = 0
 let cardMoved = false
+const mouseDownPos = { x: 0, y: 0 }
 let grabbedCardIndex = -1
 const lastPos = { x: 0, y: 0 }
 const deltaPos = { x: 0, y: 0 }
@@ -105,7 +105,7 @@ const getPos = (e: MouseEvent): screenPos => {
 }
 
 const getGrabbedEl = (): HTMLElement | undefined => {
-  return cardRefs[grabbedCardIndex]
+  return cardArray[grabbedCardIndex].el
 }
 
 const setTransform = (offsetX: number) => {
@@ -113,7 +113,7 @@ const setTransform = (offsetX: number) => {
   if (!elem) return
   elem.style.transform = `translate(${offsetX}px)`
   if (!elem.classList.contains('selected')) {
-    elem.style.marginBottom = '30px'
+    elem.style.marginBottom = '40px'
   }
 }
 
@@ -125,11 +125,14 @@ const removeTransform = () => {
 }
 
 const getIndex = (e: HTMLElement): number => {
-  return Number(e.dataset.index)
+  return cardArray.findIndex(({ card, el }) => {
+    return e === el
+  })
 }
 
 const onMouseDown = (e: MouseEvent) => {
   cardMoved = false
+  Object.assign(mouseDownPos, getPos(e))
 
   const elem = e.target as HTMLElement
   if (!elem) return
@@ -140,17 +143,17 @@ const onMouseDown = (e: MouseEvent) => {
   deltaPos.y = 0
   grabbedCardIndex = getIndex(e.target as HTMLElement)
   setTransform(0)
-  setTimeout(() => {
-    elem.style.transition = 'none'
-  }, 50)
 
   document.addEventListener('mousemove', onMouseMove)
   document.addEventListener('mouseup', onMouseUp)
 }
 
 const onMouseUp = (e: MouseEvent) => {
-  if (!cardMoved) {
-    toggleSelectCard(sortedCardCopies[grabbedCardIndex])
+  if (
+    Math.abs(mouseDownPos.x - getPos(e).x) < 5 &&
+    Math.abs(mouseDownPos.y - getPos(e).y) < 5
+  ) {
+    toggleSelectCard(cardArray[grabbedCardIndex].card)
   }
 
   const elem = getGrabbedEl()
@@ -170,6 +173,7 @@ const onMouseMove = (e: MouseEvent) => {
   const elem = getGrabbedEl()
   if (!elem) return
 
+  elem.style.transition = 'none'
   const index = getIndex(elem)
 
   if (grabbedCardIndex !== index) return
@@ -202,11 +206,11 @@ const onMouseMove = (e: MouseEvent) => {
 }
 
 const onMouseOver = (e: MouseEvent) => {
-  const elem = e.target as HTMLElement
-  if (grabbedCardIndex === -1) {
-    elem.classList.add('playing-card-hover')
-    elem.addEventListener('mouseleave', onMouseLeave)
-  }
+  // const elem = e.target as HTMLElement
+  // if (grabbedCardIndex === -1) {
+  //   elem.classList.add('playing-card-hover')
+  //   elem.addEventListener('mouseleave', onMouseLeave)
+  // }
 }
 
 const onMouseLeave = (e: MouseEvent) => {
@@ -218,17 +222,12 @@ const onMouseLeave = (e: MouseEvent) => {
   }
 }
 
-const addCardRef = (el: HTMLElement) => {
-  cardRefs.push(el)
+const addCardRef = (el: HTMLElement, index: number) => {
+  cardArray[index].el = el
   el.addEventListener('mousedown', onMouseDown)
   el.addEventListener('mouseover', onMouseOver)
 }
-watch(
-  () => store.lobby?.roundNumber,
-  () => {
-    cardRefs.length = 0
-  },
-)
+
 const shiftCard = (index: number, direction: 'left' | 'right') => {
   if (direction === 'left') {
     if (index > 0) {
@@ -241,10 +240,11 @@ const shiftCard = (index: number, direction: 'left' | 'right') => {
   }
 }
 const swapCardIndices = (index1: number, index2: number) => {
-  swapIndices(sortedCardCopies, index1, index2)
-  cardRefs[index1].dataset.index = index2.toString()
-  cardRefs[index2].dataset.index = index1.toString()
-  swapIndices(cardRefs, index1, index2)
+  const el1 = cardArray[index1].el
+  const el2 = cardArray[index2].el
+  if (!el1 || !el2) return
+
+  swapIndices(cardArray, index1, index2)
 }
 
 const swapIndices = (array: any, index1: number, index2: number) => {
@@ -283,14 +283,16 @@ const afterEnterCards = (el: any) => {
   el.style.removeProperty('opacity')
 
   // Setting card refs here to avoid bugginess
-  addCardRef(el)
+  addCardRef(el, Number(el.dataset.index))
 }
 // Leave
 const beforeLeaveCards = (el: any) => {
-  const pos = el.getBoundingClientRect()
-  el.style.position = 'fixed'
-  el.style.left = pos.left + 'px'
-  el.style.top = pos.top + 'px'
+  let pos = removedCardPosQueue.shift() as screenPos
+  if (!pos) pos = el.getBoundingClientRect()
+  console.log(pos)
+  el.style.position = 'absolute'
+  el.style.left = pos.x + 'px'
+  el.style.top = pos.y + 'px'
 }
 const leaveCards = (el: any, done: () => void) => {
   const animation = el.animate(
@@ -331,51 +333,41 @@ if (store.lobby?.game === undefined) {
   router.push({ name: 'home' })
 }
 
-const sortBySuits = ref(false)
-const sortedCardCopies = reactive<Card[]>([])
-
-watch(
-  () => store.lobby?.game.cards,
-  (newCards) => {
-    console.log('top call')
-    if (!newCards) return
-    for (let i = sortedCardCopies.length - 1; i >= 0; i--) {
-      const card = sortedCardCopies[i]
-      const index = newCards?.findIndex((newCard) => cardsEqual(card, newCard))
-      if (index === -1) {
-        sortedCardCopies.splice(i, 1)
-        cardRefs.splice(i, 1)
-        for (let newIndex = i; i < sortedCardCopies.length; ++i) {
-          cardRefs[i].dataset.index = i.toString()
-        }
-      }
-    }
-  },
-)
-
-watch(
-  () => store.lobby?.roundNumber,
-  (round) => {
-    console.log('bottom call')
-    sortedCardCopies.splice(0, Infinity, ...(store.lobby?.game.cards ?? []))
-  },
-)
-
-// Sorting
-// watch(sortBySuits, (value) => {
-//   if (value) sortCards(sortedCardCopies, true)
-//   else sortCards(sortedCardCopies)
-// })
-
-const sortedCards = computed(() => {
-  const cards = store.lobby?.game.cards || []
-  if (cards.length === 0) return []
-  if (sortBySuits.value) {
-    return sortCards(cards, true)
-  } else {
-    return sortCards(cards)
+// Current cards management
+let lastRoundNumber: number | undefined = undefined
+const clearCardArray = (round: number | undefined) => {
+  if (round !== lastRoundNumber) {
+    console.log('new game started')
+    lastRoundNumber = round
+    cardArray.length = 0
   }
-})
+}
+watch(() => store.lobby?.roundNumber, clearCardArray)
+
+const removedCardPosQueue: { x: number; y: number }[] = [] // Store positions of removed cards before it gets messed up
+const setNewCards = (newCards: Card[] | undefined) => {
+  if (!newCards) return
+
+  if (cardArray.length === 0) {
+    newCards.forEach((card) => {
+      cardArray.push({ card })
+    })
+    return
+  }
+
+  for (let i = cardArray.length - 1; i >= 0; i--) {
+    const card = cardArray[i].card
+    const index = newCards?.findIndex((newCard) => cardsEqual(card, newCard))
+    if (index === -1) {
+      const elem = cardArray.splice(i, 1)[0]
+      const el = elem.el
+      if (!el) continue
+      removedCardPosQueue.push(el.getBoundingClientRect())
+    }
+  }
+}
+watch(() => store.lobby?.game.cards, setNewCards)
+setNewCards(store.lobby?.game.cards)
 
 // Selected cards
 const selectedCards = reactive<Card[]>([])
@@ -433,7 +425,7 @@ const cardMargin = computed(() => `${cardSpacing.value - cardWidth}px`)
 const containerMargin = computed(() => `${cardWidth - cardSpacing.value}px`)
 
 const cardContainerWidth = computed(() => {
-  const width = (sortedCardCopies.length - 1) * cardSpacing.value + cardWidth
+  const width = (cardArray.length - 1) * cardSpacing.value + cardWidth
   return width + 'px'
 })
 </script>
@@ -469,9 +461,9 @@ const cardContainerWidth = computed(() => {
 .playing-card:last-child {
   margin-right: 0;
 }
-/* .playing-card:not(.selected):hover {
+.playing-card:not(.selected):hover {
   margin-bottom: 10px;
-} */
+}
 .playing-card-hover {
   margin-bottom: 10px;
 }

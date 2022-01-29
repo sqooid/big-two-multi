@@ -16,4 +16,7 @@ export default defineConfig({
       ignored: ['src/server'],
     },
   },
+  build: {
+    sourcemap: true,
+  },
 })

@@ -11,7 +11,7 @@
     "build-server": "npm run clean-server && tsc --project tsconfig.server.json && tscpaths -p tsconfig.server.json -s ./src -o ./dist"
   },
   "dependencies": {
-    "@sqooid/big-two": "^1.0.5",
+    "@sqooid/big-two": "^1.0.6",
     "dotenv": "^14.2.0",
     "express": "^4.17.2",
     "flipping": "^1.1.0",
