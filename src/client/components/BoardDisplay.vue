@@ -65,7 +65,7 @@
               </n-icon>
             </button>
             <button
-              :class="{ hidden: currentIndex === total - 1 }"
+              :class="{ hidden: currentIndex === total - 1 || total === 0 }"
               type="button"
               class="carousel-arrow arrow-right"
               @click="next">
