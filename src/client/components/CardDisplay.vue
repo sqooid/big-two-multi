@@ -337,9 +337,11 @@ if (store.lobby?.game === undefined) {
 let lastRoundNumber: number | undefined = undefined
 const clearCardArray = (round: number | undefined) => {
   if (round !== lastRoundNumber) {
-    console.log('new game started')
     lastRoundNumber = round
+    // Clear existing hand
     cardArray.length = 0
+    // Clear existing chosen cards
+    selectedCards.length = 0
   }
 }
 watch(() => store.lobby?.roundNumber, clearCardArray)
