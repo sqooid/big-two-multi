@@ -3,6 +3,7 @@ import { shuffleArray } from '@/interfaces/general-functions'
 import { ServerLobby } from '@/interfaces/server-interfaces'
 import { CallbackResults, ServerSocket } from '@/interfaces/socket-events'
 import { logGamePlays, logGameStartingHands } from '@/server/debug'
+import { extractPlay } from '@/server/game-event-handlers'
 import { createLobby, createUser, lobbyMap, userMap } from '@/server/maps'
 import {
   broadcastGame,
@@ -12,7 +13,7 @@ import {
   sendLobby,
 } from '@/server/send'
 import { generateName } from '@/server/utils'
-import { Play } from '@sqooid/big-two'
+import { findPlay, Play } from '@sqooid/big-two'
 
 export function handleCreateUser(socket: ServerSocket, name?: string) {
   name = name || generateName()
@@ -57,12 +58,22 @@ export function handleJoinLobby(
   broadcastLobby(lobby)
 }
 
-export function handleMakePlay(socket: ServerSocket, play?: Play) {
+export function handleMakePlay(socket: ServerSocket, play?: number[] | Play) {
   const user = userMap.get(socket.id)
+  const lobby = user?.lobby
   const game = user?.lobby?.game
-  if (!game) return
+  if (!game || !lobby) return
 
-  const validPlay = game.makePlay(play ?? undefined)
+  const playerIndex = lobby.players.indexOf(user)
+  const isPlayer = playerIndex !== -1
+  if (!isPlayer) return
+  const isTurn = lobby.game.currentPlayer === playerIndex
+  if (!isTurn) return
+
+  // Determine the type of play
+  const finalPlay = extractPlay(user, lobby, play)
+
+  const validPlay = game.makePlay(finalPlay)
   if (validPlay && user.lobby) {
     broadcastGame(user.lobby)
   }

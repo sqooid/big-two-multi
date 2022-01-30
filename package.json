@@ -8,7 +8,8 @@
     "clean-server": "rimraf ./dist/server/ ./dist/interfaces",
     "dev-server": "nodemon",
     "debug-server": "nodemon --inspect",
-    "build-server": "npm run clean-server && tsc --project tsconfig.server.json && tscpaths -p tsconfig.server.json -s ./src -o ./dist"
+    "build-server": "npm run clean-server && tsc --project tsconfig.server.json && tscpaths -p tsconfig.server.json -s ./src -o ./dist",
+    "test": "ts-mocha --paths -p tsconfig.server.json tests/**/**.ts"
   },
   "dependencies": {
     "@sqooid/big-two": "^1.0.6",

@@ -27,7 +27,7 @@ export function handleClientEmits(socket: ServerSocket) {
   })
 
   // Making plays
-  socket.on('makePlay', (play?: Play) => {
+  socket.on('makePlay', (play?) => {
     handleMakePlay(socket, play)
   })
 
