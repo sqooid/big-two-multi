@@ -89,7 +89,6 @@ interface screenPos {
   y: number
 }
 
-let mouseDownX = 0
 let cardMoved = false
 const mouseDownPos = { x: 0, y: 0 }
 let grabbedCardIndex = -1
