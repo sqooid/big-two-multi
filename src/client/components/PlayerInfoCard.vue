@@ -36,7 +36,7 @@ interface Props {
 
 const isTurnBorder = `1px solid ${useThemeVars().value.infoColor}`
 const isYourTurnBorder = `3px solid ${useThemeVars().value.successColor}`
-const isWinnerBorder = `1px solid ${useThemeVars().value.warningColor}`
+const isWinnerBorder = `3px solid ${useThemeVars().value.warningColor}`
 const props = defineProps<Props>()
 </script>
 
@@ -44,7 +44,7 @@ const props = defineProps<Props>()
 .player-card {
   width: 40ex;
   max-width: 20%;
-  transition: border 0.1s linear;
+  transition: all 0.1s linear;
 }
 .name-group {
   margin-bottom: 0;
