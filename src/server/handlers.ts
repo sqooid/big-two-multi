@@ -18,44 +18,60 @@ import { findPlay, Play } from '@sqooid/big-two'
 export function handleCreateUser(socket: ServerSocket, name?: string) {
   name = name || generateName()
   const newUser = createUser(socket.id, name)
+  console.log('Created user:', newUser.name)
   socket.emit('syncUser', newUser)
 }
 
-export function handleCreateLobby(socket: ServerSocket) {
-  const host = userMap.get(socket.id)
-  if (!host) return
-  const newLobby = createLobby(host)
-  console.log('Created lobby:', newLobby.id)
-  host.lobby = newLobby
-  sendLobby(host)
+export function handleCreateLobby(
+  socket: ServerSocket,
+  callback?: (response: any) => void,
+) {
+  try {
+    const host = userMap.get(socket.id)
+    if (!host) return
+    const newLobby = createLobby(host)
+    console.log('Created lobby:', newLobby.id)
+    host.lobby = newLobby
+    sendLobby(host)
+    if (callback) {
+      callback({ result: CallbackResults.SUCCESS })
+    }
+  } catch {
+    if (callback) {
+      callback({ result: CallbackResults.FAILED })
+    }
+  }
 }
 
 export function handleJoinLobby(
   socket: ServerSocket,
   id: string,
-  callback: (response: any) => void,
+  callback?: (response: any) => void,
 ) {
-  const user = userMap.get(socket.id)
-  const lobby = lobbyMap.get(id)
-  if (!user || !lobby) {
-    callback({ result: CallbackResults.FAILED })
-    return
+  try {
+    const user = userMap.get(socket.id)
+    const lobby = lobbyMap.get(id)
+    if (!user || !lobby) {
+      if (callback) callback({ result: CallbackResults.FAILED })
+      return
+    }
+
+    const gameHasStarted = lobby.game.players.length > 0
+    const gameCanFitMorePlayers =
+      (!gameHasStarted && lobby.players.length >= 4) ||
+      (gameHasStarted && lobby.players.length >= lobby.game.players.length)
+    if (!gameCanFitMorePlayers) {
+      lobby.players.push(user)
+      lobby.settings.deal.playerCount = lobby.players.length
+    } else lobby.spectators.push(user)
+    user.lobby = lobby
+
+    console.log('Joined lobby:', lobby.id)
+    if (callback) callback({ result: CallbackResults.SUCCESS })
+    broadcastLobby(lobby)
+  } catch {
+    if (callback) callback({ result: CallbackResults.FAILED })
   }
-
-  const gameHasStarted = lobby.game.players.length > 0
-  const gameCanFitMorePlayers =
-    (!gameHasStarted && lobby.players.length >= 4) ||
-    (gameHasStarted && lobby.players.length >= lobby.game.players.length)
-  if (!gameCanFitMorePlayers) {
-    lobby.players.push(user)
-    lobby.settings.deal.playerCount = lobby.players.length
-  } else lobby.spectators.push(user)
-  user.lobby = lobby
-
-  console.log('Joined lobby:', lobby.id)
-
-  callback({ result: CallbackResults.SUCCESS })
-  broadcastLobby(lobby)
 }
 
 export function handleMakePlay(socket: ServerSocket, play?: number[] | Play) {

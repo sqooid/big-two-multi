@@ -17,12 +17,12 @@ export function handleClientEmits(socket: ServerSocket) {
   })
 
   // Lobby creation
-  socket.on('createLobby', () => {
-    handleCreateLobby(socket)
+  socket.on('createLobby', (callback?) => {
+    handleCreateLobby(socket, callback)
   })
 
   // Lobby join
-  socket.on('joinLobby', (id: string, callback: (response: any) => void) => {
+  socket.on('joinLobby', (id, callback?) => {
     handleJoinLobby(socket, id, callback)
   })
 

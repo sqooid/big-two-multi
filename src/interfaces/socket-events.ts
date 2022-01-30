@@ -9,8 +9,8 @@ import {
 import { Play } from '@sqooid/big-two'
 
 export enum CallbackResults {
-  SUCCESS,
   FAILED,
+  SUCCESS,
 }
 
 export interface ServerToClientEvents {
@@ -22,7 +22,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   createUser: (name?: string) => void
   createLobby: (callback?: (response: any) => void) => void
-  joinLobby: (id: string, callback: (response: any) => void) => void
+  joinLobby: (id: string, callback?: (response: any) => void) => void
   makePlay: (play?: number[] | Play) => void
   startGame: () => void
   changeName: (name: string) => void
