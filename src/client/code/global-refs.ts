@@ -18,7 +18,7 @@ const emptyUser = { name: '', socketId: '' }
 
 export const unreactiveStore: State = {
   clientSettings: {
-    theme: 'light',
+    theme: 'dark',
     name: '',
   },
 }
