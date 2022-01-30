@@ -7,9 +7,12 @@
       'is-your-turn': props.isTurn && props.isYou,
       'is-winner': props.isWinner,
     }">
-    <n-h3 class="name">
-      <n-text depth="3">{{ props.index + 1 }} -</n-text>
-      {{ props.player.name }}{{ props.isYou ? ' (You)' : '' }}
+    <n-h3 class="name-group">
+      <div class="name">
+        <n-text depth="3">{{ props.index + 1 + ' - ' }}</n-text>
+        <n-text>{{ props.player.name }}</n-text>
+      </div>
+      <n-text v-if="props.isYou" depth="3">(You)</n-text>
     </n-h3>
     <template #action v-if="props.cards !== undefined">
       <n-p>{{ cards }} cards left</n-p>
@@ -39,11 +42,20 @@ const props = defineProps<Props>()
 
 <style scoped>
 .player-card {
-  width: fit-content;
+  width: 40ex;
+  max-width: 20%;
   transition: border 0.1s linear;
 }
-.name {
+.name-group {
   margin-bottom: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.name {
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
 }
 .is-turn {
   border: v-bind(isTurnBorder);
