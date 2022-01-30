@@ -4,5 +4,5 @@
     "module": "commonjs",
     "outDir": "dist"
   },
-  "exclude": ["tests/**/*", "src/client/**/*"]
+  "exclude": ["tests/**/*", "src/client/**/*", "src/interfaces/**/*"]
 }

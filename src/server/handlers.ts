@@ -95,9 +95,9 @@ export function handleMakePlay(socket: ServerSocket, play?: number[] | Play) {
   }
 
   // Logging
-  if (game.isFinished) {
-    logGamePlays(user.lobby as ServerLobby)
-  }
+  // if (game.isFinished) {
+  //   logGamePlays(user.lobby as ServerLobby)
+  // }
 }
 
 export function handleStartGame(socket: ServerSocket) {
@@ -132,7 +132,7 @@ export function handleStartGame(socket: ServerSocket) {
   broadcastGame(lobby, true)
 
   // Logging
-  logGameStartingHands(lobby)
+  // logGameStartingHands(lobby)
 }
 
 export function handleChangeName(socket: ServerSocket, name: string) {
