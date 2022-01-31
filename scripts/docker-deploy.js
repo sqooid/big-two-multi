@@ -26,11 +26,13 @@ if (majorVersion > versions.length) {
   process.exit(1)
 } else if (majorVersion === versions.length) {
   minorVersion = 0
+  versions.push(minorVersion)
 } else {
   minorVersion = ++versions[majorVersion]
 }
 
 const imageName = `${name}:${majorVersion}.${minorVersion}`
+const imageNameLatest = `${name}:latest`
 
 const build = spawnSync(
   'docker',
@@ -45,8 +47,18 @@ if (build.status !== 0) {
   exit(1)
 }
 
+if (majorVersion === versions.length - 1) {
+  const tag = spawnSync('docker', ['tag', imageName, `${name}:latest`], {
+    stdio: 'inherit',
+  })
+  if (tag.status !== 0) {
+    console.error('Error: image tag latest failed')
+    exit(1)
+  }
+}
+
 fs.writeFileSync(versionsFilepath, JSON.stringify(versions))
 
-const push = spawnSync('docker', ['push', imageName], {
+const push = spawnSync('docker', ['push', '--all-tags', name], {
   stdio: 'inherit',
 })
