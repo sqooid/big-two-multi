@@ -48,7 +48,7 @@ if (build.status !== 0) {
 }
 
 if (majorVersion === versions.length - 1) {
-  const tag = spawnSync('docker', ['tag', imageName, `${name}:latest`], {
+  const tag = spawnSync('docker', ['tag', imageName, imageNameLatest], {
     stdio: 'inherit',
   })
   if (tag.status !== 0) {
@@ -59,6 +59,9 @@ if (majorVersion === versions.length - 1) {
 
 fs.writeFileSync(versionsFilepath, JSON.stringify(versions))
 
-const push = spawnSync('docker', ['push', '--all-tags', name], {
+spawnSync('docker', ['push', imageNameLatest], {
+  stdio: 'inherit',
+})
+spawnSync('docker', ['push', imageName], {
   stdio: 'inherit',
 })

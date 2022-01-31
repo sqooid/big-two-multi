@@ -6,5 +6,5 @@ COPY --chown=node:node ./package*.json .
 RUN npm ci --only=production
 COPY --chown=node:node ./dist .
 USER node
-EXPOSE 80
+EXPOSE 80 443
 CMD ["dumb-init", "node", "./server/index.js"]
