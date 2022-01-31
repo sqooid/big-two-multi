@@ -27,7 +27,7 @@ try {
     'utf-8',
   )
 } catch (e) {
-  console.error('Failed to read ssl credentials:', e)
+  console.error('Unable to read ssl credentials')
 }
 
 let server
@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
   })
 })
 
-const port = Number(process.env.VITE_SERVER_PORT) || sslEnabled ? 443 : 80
+const port = Number(process.env.VITE_SERVER_PORT) || (sslEnabled ? 443 : 80)
 server.listen(port, () => {
   console.log('Listening on port', port)
 })
