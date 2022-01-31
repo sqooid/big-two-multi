@@ -14,7 +14,7 @@
             Lonely? Invite your friends using this link:
             <br />
           </n-text>
-          <n-tooltip trigger="click" placement="bottom">
+          <n-tooltip trigger="manual" placement="bottom" :show="showCopiedLink">
             <template #trigger>
               <n-text code class="invite-link" @click="onCopyLink">
                 {{ url }}
@@ -114,8 +114,13 @@ const previousPlays = computed(() => {
 })
 
 const url = computed(() => window.location.href)
+const showCopiedLink = ref(false)
 const onCopyLink = () => {
   navigator.clipboard.writeText(window.location.href)
+  showCopiedLink.value = true
+  setTimeout(() => {
+    showCopiedLink.value = false
+  }, 1000)
 }
 
 watch(previousPlays, (plays) => {

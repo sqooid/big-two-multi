@@ -380,16 +380,12 @@ const cardIndexInArray = (array: Card[], card: Card): number => {
 }
 
 const toggleSelectCard = (card: Card) => {
-  globalRefs.flipping.read()
   const cardIndex = cardIndexInArray(selectedCards, card)
   if (cardIndex === -1) {
     selectedCards.splice(0, 0, card)
   } else {
     selectedCards.splice(cardIndex, 1)
   }
-  setTimeout(() => {
-    globalRefs.flipping.flip()
-  }, 20)
 }
 
 const validHand = computed(() => {
