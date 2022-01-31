@@ -156,6 +156,7 @@ const hoverColor = useThemeVars().value.hoverColor
 }
 .invite-block {
   margin-top: 40px;
+  text-align: center;
 }
 .invite-link {
   padding: 10px;
