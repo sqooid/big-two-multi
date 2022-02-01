@@ -4,10 +4,11 @@
       <h1 class="name">Big Two</h1>
       <n-space justify="center">
         <!-- Create -->
-        <n-button :loading="createLoading" @click="onCreate">Create</n-button>
+        <n-button :loading="createLoading" @click="onCreate">
+          Create lobby
+        </n-button>
       </n-space>
-      <n-space justify="center">
-        <!-- Join -->
+      <!-- <n-space justify="center">
         <n-input-group class="input-group">
           <n-input
             v-model:value="joinId"
@@ -15,7 +16,7 @@
             @keydown.enter="onJoin" />
           <n-button :loading="joinLoading" @click="onJoin">Join</n-button>
         </n-input-group>
-      </n-space>
+      </n-space> -->
     </n-space>
   </div>
 </template>
