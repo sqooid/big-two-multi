@@ -8,7 +8,6 @@ import {
 import { CallbackResults } from '@/interfaces/socket-events'
 import { Play } from '@sqooid/big-two'
 import { LobbySettings } from '@/interfaces/client-interfaces'
-import { handleKickPlayer } from '@/server/handlers'
 
 export function startUser() {
   if (unreactiveStore.socket) unreactiveStore.socket.disconnect()

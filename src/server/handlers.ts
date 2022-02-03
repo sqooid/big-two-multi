@@ -182,6 +182,7 @@ export function handleKickPlayer(socket: ServerSocket, socketId: string) {
   const kickSocket = io.sockets.sockets.get(socketId)
   if (!kickSocket) return
 
+  kickSocket.emit('kicked')
   kickSocket.disconnect() // Broadcasting is handled by disconnect
 }
 

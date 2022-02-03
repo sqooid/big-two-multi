@@ -17,6 +17,7 @@ export interface ServerToClientEvents {
   syncLobby: (lobby: Partial<ClientLobby>) => void
   syncUser: (user: Partial<ClientUser>) => void
   syncGame: (game: Partial<ClientGame>) => void
+  kicked: () => void
 }
 
 export interface ClientToServerEvents {

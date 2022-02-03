@@ -31,7 +31,6 @@ import LobbySettings from '@/client/components/LobbySettingsMenu.vue'
 import { globalRefs } from '@/client/code/global-refs'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import OpponentDisplay from '@/client/components/OpponentDisplay.vue'
-import { OtherPlayerInfo } from '@/interfaces/client-interfaces'
 import { JoinEvent, SyncEvent } from '@/client/code/synchronisation'
 import { joinLobby, startUser } from '@/client/code/session'
 import CardDisplay from '@/client/components/CardDisplay.vue'
@@ -76,6 +75,20 @@ const showSettings = ref(false)
 
 const onShowSettings = () => {
   showSettings.value = true
+}
+
+// Handle getting kicked
+const socket = store.socket
+if (socket) {
+  socket.on('kicked', () => {
+    const showLol = Math.random() > 0.9
+    if (showLol) {
+      message.error('You got kicked lol')
+    } else {
+      message.error('You got kicked')
+    }
+    router.push({ name: 'home' })
+  })
 }
 </script>
 
