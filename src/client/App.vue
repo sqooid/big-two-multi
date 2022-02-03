@@ -42,15 +42,15 @@ const store = globalRefs.reactiveStore // For consistency
 
 const themeOverrides: GlobalThemeOverrides = {}
 
-const theme = computed(() => {
-  const themeSetting = store?.clientSettings.theme
-  if (themeSetting === 'dark') return darkTheme
-  return null
-})
-
 // Loading default client settings
 store.clientSettings.theme = getKey(StorageKeys.DEFAULT_THEME) as ThemeSetting
 store.clientSettings.name = getKey(StorageKeys.DEFAULT_NAME)
+
+const theme = computed(() => {
+  const themeSetting = store?.clientSettings.theme
+  if (themeSetting === 'light') return null
+  return darkTheme
+})
 </script>
 
 <style scoped></style>

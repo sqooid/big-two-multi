@@ -46,6 +46,7 @@ watch(
       router.push({ name: 'lobby', params: { id: lobby.id } })
     }
   },
+  { deep: true },
 )
 
 const createLoading = ref(false)
@@ -66,11 +67,6 @@ document.addEventListener(JoinEvent.FAIL, () => {
   joinLoading.value = false
   message.error('Failed to join lobby')
 })
-
-const onSwitchTheme = (value: boolean) => {
-  if (value) globalRefs.reactiveStore.clientSettings.theme = 'dark'
-  else globalRefs.reactiveStore.clientSettings.theme = 'light'
-}
 </script>
 
 <style scoped>
