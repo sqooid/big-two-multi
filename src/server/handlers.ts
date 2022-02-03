@@ -2,11 +2,13 @@ import { LobbySettings } from '@/interfaces/client-interfaces'
 import { shuffleArray } from '@/interfaces/general-functions'
 import { ServerLobby } from '@/interfaces/server-interfaces'
 import { CallbackResults, ServerSocket } from '@/interfaces/socket-events'
+import { io } from '@/server'
 import { logGamePlays, logGameStartingHands } from '@/server/debug'
 import { extractPlay } from '@/server/game-event-handlers'
 import { createLobby, createUser, lobbyMap, userMap } from '@/server/maps'
 import {
   broadcastGame,
+  broadcastHostChange,
   broadcastLobby,
   broadcastLobbySettings,
   broadcastUsersInLobby,
@@ -167,4 +169,35 @@ export function handleChangeLobbySettings(
   lobby.settings = settings
 
   broadcastLobbySettings(lobby)
+}
+
+export function handleKickPlayer(socket: ServerSocket, socketId: string) {
+  const user = userMap.get(socket.id)
+  const lobby = user?.lobby
+  if (!user || !lobby) return
+
+  const isHost = lobby.host === user
+  if (!isHost) return
+
+  const kickSocket = io.sockets.sockets.get(socketId)
+  if (!kickSocket) return
+
+  kickSocket.disconnect() // Broadcasting is handled by disconnect
+}
+
+export function handleMakePlayerHost(socket: ServerSocket, socketId: string) {
+  const user = userMap.get(socket.id)
+  const lobby = user?.lobby
+  if (!user || !lobby) return
+
+  const isHost = lobby.host === user
+  if (!isHost) return
+
+  const newHost = userMap.get(socketId)
+
+  if (!newHost || newHost.lobby !== lobby) return
+
+  lobby.host = newHost
+
+  broadcastHostChange(lobby)
 }

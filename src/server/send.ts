@@ -4,7 +4,7 @@ import { ClientGame, ClientLobby } from '@/interfaces/client-interfaces'
 import {
   ServerLobby,
   ServerUser,
-  serverUserToUser,
+  serverUserToUser as toClientUser,
 } from '@/interfaces/server-interfaces'
 import { Game } from '@sqooid/big-two'
 import { logGamePlays } from '@/server/debug'
@@ -42,9 +42,9 @@ export function getClientLobby(user: ServerUser): ClientLobby | undefined {
   const playerIndex = serverLobby.players.indexOf(user)
   return {
     id: serverLobby.id,
-    host: serverUserToUser(serverLobby.host),
-    players: serverLobby.players.map((user) => serverUserToUser(user)),
-    spectators: serverLobby.spectators.map((user) => serverUserToUser(user)),
+    host: toClientUser(serverLobby.host),
+    players: serverLobby.players.map((user) => toClientUser(user)),
+    spectators: serverLobby.spectators.map((user) => toClientUser(user)),
     settings: serverLobby.settings,
     game: getClientSpecGame(serverLobby.game, playerIndex),
     roundNumber: serverLobby.roundNumber,
@@ -72,7 +72,7 @@ export function broadcastGame(lobby: ServerLobby, newGame?: boolean) {
     const specGame = getClientSpecGame(lobby.game, playerIndex)
     if (newGame) {
       io.to(watcher.socketId).emit('syncLobby', {
-        players: lobby.players.map((user) => serverUserToUser(user)),
+        players: lobby.players.map((user) => toClientUser(user)),
         roundNumber: lobby.roundNumber,
       })
     }
@@ -90,9 +90,9 @@ export function broadcastUsersInLobby(lobby: ServerLobby) {
   const watchers = getLobbyWatchers(lobby)
   for (const watcher of watchers) {
     const lobbyUsersOnly: Partial<ClientLobby> = {
-      host: serverUserToUser(lobby.host),
-      players: lobby.players.map((user) => serverUserToUser(user)),
-      spectators: lobby.spectators.map((user) => serverUserToUser(user)),
+      host: toClientUser(lobby.host),
+      players: lobby.players.map((user) => toClientUser(user)),
+      spectators: lobby.spectators.map((user) => toClientUser(user)),
     }
     io.to(watcher.socketId).emit('syncLobby', lobbyUsersOnly)
   }
@@ -103,6 +103,15 @@ export function broadcastLobbySettings(lobby: ServerLobby) {
   for (const watcher of watchers) {
     io.to(watcher.socketId).emit('syncLobby', {
       settings: lobby.settings,
+    })
+  }
+}
+
+export function broadcastHostChange(lobby: ServerLobby) {
+  const watchers = getLobbyWatchers(lobby)
+  for (const watcher of watchers) {
+    io.to(watcher.socketId).emit('syncLobby', {
+      host: toClientUser(lobby.host),
     })
   }
 }

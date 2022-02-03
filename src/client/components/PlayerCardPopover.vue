@@ -3,8 +3,8 @@
     <n-h5 class="name">{{ props.info.user.name }}</n-h5>
     <div v-if="isHost && !props.info.isHost" class="host-controls">
       <n-button-group vertical>
-        <n-button>Make host</n-button>
-        <n-button>Kick</n-button>
+        <n-button @click="onMakeHost">Make host</n-button>
+        <n-button @click="onKick">Kick</n-button>
       </n-button-group>
     </div>
   </div>
@@ -12,6 +12,7 @@
 
 <script lang="ts" setup>
 import { globalRefs } from '@/client/code/global-refs'
+import { kickPlayer, makePlayerHost } from '@/client/code/session'
 import { PlayerCardInfo } from '@/interfaces/client-interfaces'
 import { NText, NButton, NDivider, NButtonGroup, NH5 } from 'naive-ui'
 import { computed } from 'vue'
@@ -25,6 +26,14 @@ interface Props {
 const props = defineProps<Props>()
 
 const isHost = computed(() => store.lobby?.host.socketId === store.socket?.id)
+
+const onMakeHost = () => {
+  makePlayerHost(props.info.user.socketId)
+}
+
+const onKick = () => {
+  kickPlayer(props.info.user.socketId)
+}
 </script>
 
 <style scoped>

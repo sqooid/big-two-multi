@@ -8,6 +8,7 @@ import {
 import { CallbackResults } from '@/interfaces/socket-events'
 import { Play } from '@sqooid/big-two'
 import { LobbySettings } from '@/interfaces/client-interfaces'
+import { handleKickPlayer } from '@/server/handlers'
 
 export function startUser() {
   if (unreactiveStore.socket) unreactiveStore.socket.disconnect()
@@ -62,4 +63,18 @@ export function changeLobbySettings(settings: LobbySettings) {
   if (!socket) return
 
   socket.emit('changeLobbySettings', settings)
+}
+
+export function kickPlayer(socketId: string) {
+  const socket = unreactiveStore.socket
+  if (!socket) return
+
+  socket.emit('kickPlayer', socketId)
+}
+
+export function makePlayerHost(socketId: string) {
+  const socket = unreactiveStore.socket
+  if (!socket) return
+
+  socket.emit('makePlayerHost', socketId)
 }

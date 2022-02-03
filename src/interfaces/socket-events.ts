@@ -27,6 +27,8 @@ export interface ClientToServerEvents {
   startGame: () => void
   changeName: (name: string) => void
   changeLobbySettings: (settings: LobbySettings) => void
+  kickPlayer: (socketId: string) => void
+  makePlayerHost: (socketId: string) => void
 }
 
 export type ClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>

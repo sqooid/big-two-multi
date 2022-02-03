@@ -5,7 +5,9 @@ import {
   handleCreateLobby,
   handleCreateUser,
   handleJoinLobby,
+  handleKickPlayer,
   handleMakePlay,
+  handleMakePlayerHost,
   handleStartGame,
 } from '@/server/handlers'
 import { ServerSocket } from '@/interfaces/socket-events'
@@ -45,4 +47,14 @@ export function handleClientEmits(socket: ServerSocket) {
   socket.on('changeLobbySettings', (settings) =>
     handleChangeLobbySettings(socket, settings),
   )
+
+  // Kick player
+  socket.on('kickPlayer', (socketId) => {
+    handleKickPlayer(socket, socketId)
+  })
+
+  // Change host
+  socket.on('makePlayerHost', (socketId) => {
+    handleMakePlayerHost(socket, socketId)
+  })
 }
