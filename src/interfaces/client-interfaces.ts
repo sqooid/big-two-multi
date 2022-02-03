@@ -16,13 +16,14 @@ export interface ClientUser {
   name: string
 }
 
-export interface OtherPlayerInfo {
+export interface PlayerCardInfo {
   user: ClientUser
   isHost: boolean
   index: number
   remainingCards?: number
   isWinner?: boolean
   isTurn?: boolean
+  isYou?: boolean
 }
 
 export interface ClientLobby {

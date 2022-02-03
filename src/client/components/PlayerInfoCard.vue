@@ -3,35 +3,30 @@
     class="player-card"
     hoverable
     :class="{
-      'is-turn': props.isTurn && !props.isYou,
-      'is-your-turn': props.isTurn && props.isYou,
-      'is-winner': props.isWinner,
+      'is-turn': props.info.isTurn && !props.info.isYou,
+      'is-your-turn': props.info.isTurn && props.info.isYou,
+      'is-winner': props.info.isWinner,
     }">
     <n-h3 class="name-group">
       <div class="name">
-        <n-text depth="3">{{ props.index + 1 + ' - ' }}</n-text>
-        <n-text>{{ props.player.name }}</n-text>
+        <n-text depth="3">{{ props.info.index + 1 + ' - ' }}</n-text>
+        <n-text>{{ props.info.user.name }}</n-text>
       </div>
-      <n-text v-if="props.isYou" depth="3">(You)</n-text>
+      <n-text v-if="props.info.isYou" depth="3">(You)</n-text>
     </n-h3>
-    <template #action v-if="props.cards !== undefined">
-      <n-p>{{ cards }} cards left</n-p>
+    <template #action v-if="props.info.remainingCards !== undefined">
+      <n-p>{{ props.info.remainingCards }} cards left</n-p>
     </template>
   </n-card>
 </template>
 
 <script lang="ts" setup>
-import { ClientUser } from '@/interfaces/client-interfaces'
+import { ClientUser, PlayerCardInfo } from '@/interfaces/client-interfaces'
 import { NCard, NH3, NP, useThemeVars, NText } from 'naive-ui'
 import { computed } from 'vue'
 
 interface Props {
-  player: ClientUser
-  index: number
-  cards?: number
-  isTurn?: boolean
-  isWinner?: boolean
-  isYou?: boolean
+  info: PlayerCardInfo
 }
 
 const isTurnBorder = `1px solid ${useThemeVars().value.infoColor}`
@@ -43,7 +38,8 @@ const props = defineProps<Props>()
 <style scoped>
 .player-card {
   width: 40ex;
-  max-width: 20%;
+  cursor: pointer;
+  max-width: 100%;
   transition: all 0.1s linear;
 }
 .name-group {

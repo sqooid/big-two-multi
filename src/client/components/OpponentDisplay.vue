@@ -1,26 +1,29 @@
 <template>
   <transition-group name="expand" tag="div" id="opponent-display">
-    <player-info-card
-      v-for="player in otherPlayers"
-      :key="player.user.socketId"
-      :index="player.index"
-      :player="player.user"
-      :cards="player.remainingCards"
-      :is-winner="player.isWinner"
-      :is-turn="player.isTurn"
-      :is-you="player.isYou" />
+    <div
+      class="wrapper"
+      v-for="player in playerList"
+      :key="player.user.socketId">
+      <n-popover trigger="click" width="trigger">
+        <template #trigger>
+          <player-info-card :info="player" />
+        </template>
+        <player-card-popover :info="player" />
+      </n-popover>
+    </div>
   </transition-group>
 </template>
 
 <script lang="ts" setup>
-import { OtherPlayerInfo } from '@/interfaces/client-interfaces'
 import PlayerInfoCard from '@/client/components/PlayerInfoCard.vue'
 import { globalRefs } from '@/client/code/global-refs'
 import { computed } from 'vue'
+import { NPopover } from 'naive-ui'
+import PlayerCardPopover from '@/client/components/PlayerCardPopover.vue'
 
 const store = globalRefs.reactiveStore
 
-const otherPlayers = computed(() => {
+const playerList = computed(() => {
   const players = store.lobby?.players
   if (!players) return []
 
@@ -53,5 +56,8 @@ const otherPlayers = computed(() => {
   flex-direction: row;
   justify-content: space-evenly;
   align-items: flex-start;
+}
+.wrapper {
+  max-width: 20%;
 }
 </style>
