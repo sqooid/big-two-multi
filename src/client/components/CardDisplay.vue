@@ -287,9 +287,11 @@ const afterEnterCards = (el: any) => {
 // Leave
 const beforeLeaveCards = (el: any) => {
   let pos = removedCardPosQueue.shift() as screenPos
-  if (!pos) pos = el.getBoundingClientRect()
-  console.log(pos)
   el.style.position = 'absolute'
+  if (!pos) {
+    el.style.display = 'none'
+    return
+  }
   el.style.left = pos.x + 'px'
   el.style.top = pos.y + 'px'
 }
