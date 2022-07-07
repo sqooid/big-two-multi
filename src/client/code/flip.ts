@@ -75,7 +75,6 @@ export class FlipTracker {
         return
       }
       const currentProperties = this._getElementFlipProperties(element)
-      console.log(currentProperties)
       map.set(id, currentProperties)
       if (initialProperties === undefined) {
         return

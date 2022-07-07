@@ -11,6 +11,7 @@ import { Server } from 'socket.io'
 import path from 'path'
 import fs from 'fs'
 import { removeUser } from '@/server/maps'
+import { log } from './log'
 
 dotenv.config()
 
@@ -54,22 +55,22 @@ export const io = new Server<ClientToServerEvents, ServerToClientEvents>(
 app.use(express.static(process.cwd())) // Fix working root directory
 
 app.get('*', (req, res) => {
-  console.log('Page served')
+  log(`[${req.ip}] Page served`)
   res.sendFile(process.cwd() + '/index.html')
 })
 
 io.on('connection', (socket) => {
-  console.log('Client connected')
+  log(`[${socket.handshake.address}] Client connected: ${socket.id}`)
 
   handleClientEmits(socket)
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected')
+    log(`[${socket.handshake.address}] Client disconnected: ${socket.id}`)
     removeUser(socket.id)
   })
 })
 
 const port = Number(process.env.VITE_SERVER_PORT) || (sslEnabled ? 443 : 80)
 server.listen(port, () => {
-  console.log('Listening on port', port)
+  log(`[Server] Listening on port ${port}`)
 })

@@ -16,11 +16,12 @@ import {
 } from '@/server/send'
 import { generateName } from '@/server/utils'
 import { findPlay, Play } from '@sqooid/big-two'
+import { log } from './log'
 
 export function handleCreateUser(socket: ServerSocket, name?: string) {
   name = name || generateName()
   const newUser = createUser(socket.id, name)
-  console.log('Created user:', newUser.name)
+  log(`[${socket.handshake.address}] Created user: ${newUser.name}`)
   socket.emit('syncUser', newUser)
 }
 
@@ -32,7 +33,9 @@ export function handleCreateLobby(
     const host = userMap.get(socket.id)
     if (!host) return
     const newLobby = createLobby(host)
-    console.log('Created lobby:', newLobby.id)
+    log(
+      `[${socket.handshake.address}] ${socket.id} created lobby: ${newLobby.id}`,
+    )
     host.lobby = newLobby
     sendLobby(host)
     if (callback) {
@@ -68,7 +71,7 @@ export function handleJoinLobby(
     } else lobby.spectators.push(user)
     user.lobby = lobby
 
-    console.log('Joined lobby:', lobby.id)
+    log(`[${socket.handshake.address}] ${socket.id} joined lobby: ${lobby.id}`)
     if (callback) callback({ result: CallbackResults.SUCCESS })
     broadcastLobby(lobby)
   } catch {
@@ -114,7 +117,7 @@ export function handleStartGame(socket: ServerSocket) {
     lobby.settings.deal.playerCount > 1 && lobby.settings.deal.playerCount < 5
   if (!validPlayerCount) return
 
-  console.log('Started game: ', lobby.id)
+  log(`[${socket.handshake.address}] ${socket.id} started game: ${lobby.id}`)
   const winnerIndex = lobby.game.winner
   const isFirstGame = winnerIndex === undefined
 

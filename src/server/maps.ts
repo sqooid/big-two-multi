@@ -2,6 +2,7 @@ import { ServerLobby, ServerUser } from '@/interfaces/server-interfaces'
 import { broadcastLobby } from '@/server/send'
 import { randomString } from '@/server/utils'
 import { createGame } from '@sqooid/big-two'
+import { log } from './log'
 
 export const lobbyMap = new Map<string, ServerLobby>()
 
@@ -65,6 +66,7 @@ export function removeUser(socketId: string) {
     lobby.host = lobby.players[0]
     if (!lobby.host) {
       lobbyMap.delete(lobby.id)
+      log(`Destroyed lobby: ${lobby.id}`)
       return
     }
   }
