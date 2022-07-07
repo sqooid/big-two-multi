@@ -36,7 +36,7 @@ const imageNameLatest = `${name}:latest`
 
 const build = spawnSync(
   'docker',
-  ['build', '--platform', platform, '-t', imageName, '.'],
+  ['buildx', 'build', '--platform', platform, '-t', imageName, '--push', '.'],
   {
     stdio: 'inherit',
   },

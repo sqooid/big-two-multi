@@ -5,10 +5,10 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "clean-server": "rimraf ./dist/server/ ./dist/interfaces",
+    "clean-server": "rm -rf ./dist/server/ ./dist/interfaces",
     "dev-server": "nodemon",
     "debug-server": "nodemon --inspect",
-    "build-server": "npm run clean-server && tsc --project tsconfig.server.json && tscpaths -p tsconfig.server.json -s ./src -o ./dist",
+    "build-server": "pnpm run clean-server && tsc --project tsconfig.server.json && tscpaths -p tsconfig.server.json -s ./src -o ./dist",
     "test": "ts-mocha --paths -p tsconfig.server.json tests/**/**.ts"
   },
   "dependencies": {
